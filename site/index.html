@@ -187,6 +187,8 @@
       line-height: 1.8;
       overflow-x: auto;
     }
+    .terminal-body .line { display: block; }
+    .terminal-body .line.gap { margin-top: 12px; }
     .terminal-body .prompt { color: var(--green); }
     .terminal-body .cmd { color: var(--fg); cursor: pointer; border-radius: 3px; transition: background 0.15s; }
     .terminal-body .cmd:hover { background: rgba(255,255,255,0.06); }
@@ -351,29 +353,29 @@
         <button class="copy-term" onclick="copyBlock(this)">Copy</button>
       </div>
       <div class="terminal-body">
-<span class="comment"># JSON</span>
-<span class="prompt">$</span> <span class="cmd">curl -s api.github.com/users/octocat | pick login</span>
-<span class="output">octocat</span>
+<span class="line"><span class="comment"># JSON</span></span>
+<span class="line"><span class="prompt">$</span> <span class="cmd">curl -s api.github.com/users/octocat | pick login</span></span>
+<span class="line"><span class="output">octocat</span></span>
 
-<span class="comment"># .env</span>
-<span class="prompt">$</span> <span class="cmd">cat .env | pick DATABASE_URL</span>
-<span class="output">postgres://localhost:5432/mydb</span>
+<span class="line gap"><span class="comment"># .env</span></span>
+<span class="line"><span class="prompt">$</span> <span class="cmd">cat .env | pick DATABASE_URL</span></span>
+<span class="line"><span class="output">postgres://localhost:5432/mydb</span></span>
 
-<span class="comment"># YAML</span>
-<span class="prompt">$</span> <span class="cmd">cat config.yaml | pick server.port</span>
-<span class="output">8080</span>
+<span class="line gap"><span class="comment"># YAML</span></span>
+<span class="line"><span class="prompt">$</span> <span class="cmd">cat config.yaml | pick server.port</span></span>
+<span class="line"><span class="output">8080</span></span>
 
-<span class="comment"># HTTP headers</span>
-<span class="prompt">$</span> <span class="cmd">curl -sI example.com | pick content-type</span>
-<span class="output">text/html; charset=UTF-8</span>
+<span class="line gap"><span class="comment"># HTTP headers</span></span>
+<span class="line"><span class="prompt">$</span> <span class="cmd">curl -sI example.com | pick content-type</span></span>
+<span class="line"><span class="output">text/html; charset=UTF-8</span></span>
 
-<span class="comment"># CSV</span>
-<span class="prompt">$</span> <span class="cmd">cat users.csv | pick '[0].name'</span>
-<span class="output">Alice</span>
+<span class="line gap"><span class="comment"># CSV</span></span>
+<span class="line"><span class="prompt">$</span> <span class="cmd">cat users.csv | pick '[0].name'</span></span>
+<span class="line"><span class="output">Alice</span></span>
 
-<span class="comment"># logfmt</span>
-<span class="prompt">$</span> <span class="cmd">echo 'level=info status=200' | pick status</span>
-<span class="output">200</span>
+<span class="line gap"><span class="comment"># logfmt</span></span>
+<span class="line"><span class="prompt">$</span> <span class="cmd">echo 'level=info status=200' | pick status</span></span>
+<span class="line"><span class="output">200</span></span>
       </div>
     </div>
   </div>
@@ -477,12 +479,12 @@
         <button class="copy-term" onclick="copyBlock(this)">Copy</button>
       </div>
       <div class="terminal-body">
-<span class="comment"># npm (macOS, Linux, Windows)</span>
-<span class="prompt">$</span> <span class="cmd">npm install -g @aryanbhosale/pick</span>
+<span class="line"><span class="comment"># npm (macOS, Linux, Windows)</span></span>
+<span class="line"><span class="prompt">$</span> <span class="cmd">npm install -g @aryanbhosale/pick</span></span>
 
-<span class="comment"># from source (Rust 1.85+)</span>
-<span class="prompt">$</span> <span class="cmd">git clone https://github.com/aryanbhosale/pick.git</span>
-<span class="prompt">$</span> <span class="cmd">cd pick && cargo install --path .</span>
+<span class="line gap"><span class="comment"># from source (Rust 1.85+)</span></span>
+<span class="line"><span class="prompt">$</span> <span class="cmd">git clone https://github.com/aryanbhosale/pick.git</span></span>
+<span class="line"><span class="prompt">$</span> <span class="cmd">cd pick && cargo install --path .</span></span>
       </div>
     </div>
   </section>
