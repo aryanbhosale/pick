@@ -1,0 +1,36 @@
+{
+  "name": "pick-cli",
+  "version": "0.1.0",
+  "description": "Extract values from anything — JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV, and more",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aryanbhosale/pick"
+  },
+  "keywords": [
+    "cli",
+    "extract",
+    "json",
+    "yaml",
+    "toml",
+    "env",
+    "logfmt",
+    "csv",
+    "jq",
+    "yq",
+    "parser"
+  ],
+  "bin": {
+    "pick": "bin/pick.js"
+  },
+  "files": [
+    "bin"
+  ],
+  "optionalDependencies": {
+    "pick-cli-darwin-arm64": "0.1.0",
+    "pick-cli-darwin-x64": "0.1.0",
+    "pick-cli-linux-x64": "0.1.0",
+    "pick-cli-linux-arm64": "0.1.0",
+    "pick-cli-win32-x64": "0.1.0"
+  }
+}
