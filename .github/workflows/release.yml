@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
   build:
@@ -70,7 +71,27 @@ jobs:
           cp target/${{ matrix.target }}/release/${{ matrix.bin }} npm/${{ matrix.npm_pkg }}/bin/${{ matrix.bin }}
           chmod +x npm/${{ matrix.npm_pkg }}/bin/${{ matrix.bin }}
 
-      - name: Upload artifact
+      - name: Create release archive
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          if [ "${{ matrix.bin }}" = "pick.exe" ]; then
+            ARCHIVE="pick-v${VERSION}-${{ matrix.target }}.zip"
+            cd target/${{ matrix.target }}/release
+            zip "../../../${ARCHIVE}" ${{ matrix.bin }}
+            cd ../../..
+          else
+            ARCHIVE="pick-v${VERSION}-${{ matrix.target }}.tar.gz"
+            tar -czf "${ARCHIVE}" -C target/${{ matrix.target }}/release ${{ matrix.bin }}
+          fi
+          echo "ARCHIVE=${ARCHIVE}" >> "$GITHUB_ENV"
+
+      - name: Upload binary archive
+        uses: actions/upload-artifact@v7
+        with:
+          name: archive-${{ matrix.target }}
+          path: pick-v*
+
+      - name: Upload npm artifact
         uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.npm_pkg }}
@@ -120,7 +141,7 @@ jobs:
           for pkg_dir in npm/pick-cli-darwin-arm64 npm/pick-cli-darwin-x64 npm/pick-cli-linux-x64 npm/pick-cli-linux-arm64 npm/pick-cli-win32-x64; do
             echo "Publishing $(basename $pkg_dir)..."
             cd "$pkg_dir"
-            npm publish --access public || echo "  (skipped, may already exist)"
+            npm publish --access public --provenance || echo "  (skipped, may already exist)"
             cd "$GITHUB_WORKSPACE"
           done
 
@@ -129,9 +150,18 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd npm/pick-cli
-          npm publish --access public
+          npm publish --access public --provenance
+
+      - name: Download binary archives
+        uses: actions/download-artifact@v8
+        with:
+          pattern: archive-*
+          path: archives
+          merge-multiple: true
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.ref_name }}
           generate_release_notes: true
+          files: archives/*

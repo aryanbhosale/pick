@@ -15,11 +15,18 @@
     "yaml",
     "toml",
     "env",
+    "dotenv",
     "logfmt",
     "csv",
     "jq",
     "yq",
-    "parser"
+    "parser",
+    "pipe",
+    "data-extraction",
+    "http-headers",
+    "key-value",
+    "command-line",
+    "developer-tools"
   ],
   "bin": {
     "pick": "bin/pick.js"
