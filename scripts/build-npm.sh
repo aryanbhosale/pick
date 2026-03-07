@@ -22,17 +22,26 @@ get_target() {
   esac
 }
 
-# Update version in all package.json files
+# Update version in all package.json files (using node for safe JSON manipulation)
 for pkg_dir in "$NPM_DIR"/pick-cli*/; do
   if [ -f "$pkg_dir/package.json" ]; then
-    sed -i.bak "s/\"version\": \".*\"/\"version\": \"${VERSION}\"/" "$pkg_dir/package.json"
-    rm -f "$pkg_dir/package.json.bak"
+    PKG_FILE="$pkg_dir/package.json" VERSION="$VERSION" node -e '
+      const fs = require("fs");
+      const f = process.env.PKG_FILE;
+      const v = process.env.VERSION;
+      const pkg = JSON.parse(fs.readFileSync(f, "utf8"));
+      pkg.version = v;
+      if (pkg.optionalDependencies) {
+        for (const k of Object.keys(pkg.optionalDependencies)) {
+          if (k.startsWith("@aryanbhosale/pick-")) {
+            pkg.optionalDependencies[k] = v;
+          }
+        }
+      }
+      fs.writeFileSync(f, JSON.stringify(pkg, null, 2) + "\n");
+    '
   fi
 done
-
-# Also update optionalDependencies versions in main package
-sed -i.bak "s/\"@aryanbhosale\/pick-\([^\"]*\)\": \"[^\"]*\"/\"@aryanbhosale\/pick-\1\": \"${VERSION}\"/g" "$NPM_DIR/pick-cli/package.json"
-rm -f "$NPM_DIR/pick-cli/package.json.bak"
 
 build_platform() {
   local platform="$1"

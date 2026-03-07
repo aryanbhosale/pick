@@ -23,7 +23,7 @@ pub fn parse(input: &str) -> Result<Value, PickError> {
             // Strip surrounding quotes (double or single)
             let value = strip_quotes(value);
 
-            map.insert(key, Value::String(value.to_string()));
+            map.insert(key, Value::String(value));
         }
     }
 
@@ -37,13 +37,35 @@ pub fn parse(input: &str) -> Result<Value, PickError> {
     Ok(Value::Object(map))
 }
 
-fn strip_quotes(s: &str) -> &str {
-    if s.len() >= 2
-        && ((s.starts_with('"') && s.ends_with('"')) || (s.starts_with('\'') && s.ends_with('\'')))
-    {
-        return &s[1..s.len() - 1];
+fn strip_quotes(s: &str) -> String {
+    if s.len() >= 2 && s.starts_with('"') && s.ends_with('"') {
+        let inner = &s[1..s.len() - 1];
+        let mut result = String::with_capacity(inner.len());
+        let mut chars = inner.chars();
+        while let Some(c) = chars.next() {
+            if c == '\\' {
+                match chars.next() {
+                    Some('"') => result.push('"'),
+                    Some('\\') => result.push('\\'),
+                    Some('n') => result.push('\n'),
+                    Some('t') => result.push('\t'),
+                    Some('r') => result.push('\r'),
+                    Some(other) => {
+                        result.push('\\');
+                        result.push(other);
+                    }
+                    None => result.push('\\'),
+                }
+            } else {
+                result.push(c);
+            }
+        }
+        return result;
     }
-    s
+    if s.len() >= 2 && s.starts_with('\'') && s.ends_with('\'') {
+        return s[1..s.len() - 1].to_string();
+    }
+    s.to_string()
 }
 
 #[cfg(test)]

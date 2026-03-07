@@ -1,6 +1,8 @@
 use crate::error::PickError;
 use serde_json::Value;
 
+const MAX_EXTRACT_RESULTS: usize = 1_000_000;
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Selector {
     pub segments: Vec<Segment>,
@@ -68,13 +70,48 @@ fn parse_key(input: &str) -> Result<(Option<String>, &str), PickError> {
     let first = input.as_bytes()[0];
 
     if first == b'"' {
-        // Quoted key
+        // Quoted key with escape support
         let rest = &input[1..];
-        let end = rest
-            .find('"')
-            .ok_or_else(|| PickError::InvalidSelector("unterminated quoted key".into()))?;
-        let key = &rest[..end];
-        Ok((Some(key.to_string()), &rest[end + 1..]))
+        let mut key = String::new();
+        let mut chars = rest.chars();
+        let mut consumed = 0;
+        loop {
+            match chars.next() {
+                None => return Err(PickError::InvalidSelector("unterminated quoted key".into())),
+                Some('"') => {
+                    consumed += 1;
+                    break;
+                }
+                Some('\\') => {
+                    consumed += 1;
+                    match chars.next() {
+                        Some('"') => {
+                            key.push('"');
+                            consumed += 1;
+                        }
+                        Some('\\') => {
+                            key.push('\\');
+                            consumed += 1;
+                        }
+                        Some(c) => {
+                            key.push('\\');
+                            key.push(c);
+                            consumed += c.len_utf8();
+                        }
+                        None => {
+                            return Err(PickError::InvalidSelector(
+                                "unterminated quoted key".into(),
+                            ));
+                        }
+                    }
+                }
+                Some(c) => {
+                    key.push(c);
+                    consumed += c.len_utf8();
+                }
+            }
+        }
+        Ok((Some(key), &rest[consumed..]))
     } else if first == b'[' {
         // No key, just indices
         Ok((None, input))
@@ -174,7 +211,8 @@ pub fn extract(value: &Value, selector: &Selector) -> Result<Vec<Value>, PickErr
                         Index::Number(n) => match v {
                             Value::Array(arr) => {
                                 let i = if *n < 0 {
-                                    let len = arr.len() as i64;
+                                    let len = i64::try_from(arr.len())
+                                        .map_err(|_| PickError::IndexOutOfBounds(*n))?;
                                     if n.unsigned_abs() > len as u64 {
                                         return Err(PickError::IndexOutOfBounds(*n));
                                     }
@@ -205,6 +243,9 @@ pub fn extract(value: &Value, selector: &Selector) -> Result<Vec<Value>, PickErr
             }
 
             next.extend(indexed);
+            if next.len() > MAX_EXTRACT_RESULTS {
+                return Err(PickError::TooManyResults(MAX_EXTRACT_RESULTS));
+            }
         }
 
         current = next;

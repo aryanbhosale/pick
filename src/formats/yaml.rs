@@ -2,16 +2,16 @@ use crate::error::PickError;
 use serde_json::Value;
 
 pub fn parse(input: &str) -> Result<Value, PickError> {
-    let yaml_value: serde_yaml::Value = serde_yaml::from_str(input)
+    let yaml_value: serde_yml::Value = serde_yml::from_str(input)
         .map_err(|e| PickError::ParseError("YAML".into(), e.to_string()))?;
     yaml_to_json(yaml_value)
 }
 
-fn yaml_to_json(v: serde_yaml::Value) -> Result<Value, PickError> {
+fn yaml_to_json(v: serde_yml::Value) -> Result<Value, PickError> {
     match v {
-        serde_yaml::Value::Null => Ok(Value::Null),
-        serde_yaml::Value::Bool(b) => Ok(Value::Bool(b)),
-        serde_yaml::Value::Number(n) => {
+        serde_yml::Value::Null => Ok(Value::Null),
+        serde_yml::Value::Bool(b) => Ok(Value::Bool(b)),
+        serde_yml::Value::Number(n) => {
             if let Some(i) = n.as_i64() {
                 Ok(Value::Number(i.into()))
             } else if let Some(u) = n.as_u64() {
@@ -24,25 +24,25 @@ fn yaml_to_json(v: serde_yaml::Value) -> Result<Value, PickError> {
                 Ok(Value::Null)
             }
         }
-        serde_yaml::Value::String(s) => Ok(Value::String(s)),
-        serde_yaml::Value::Sequence(seq) => {
+        serde_yml::Value::String(s) => Ok(Value::String(s)),
+        serde_yml::Value::Sequence(seq) => {
             let items: Result<Vec<Value>, _> = seq.into_iter().map(yaml_to_json).collect();
             Ok(Value::Array(items?))
         }
-        serde_yaml::Value::Mapping(map) => {
+        serde_yml::Value::Mapping(map) => {
             let mut obj = serde_json::Map::new();
             for (k, v) in map {
                 let key = match k {
-                    serde_yaml::Value::String(s) => s,
-                    serde_yaml::Value::Number(n) => n.to_string(),
-                    serde_yaml::Value::Bool(b) => b.to_string(),
+                    serde_yml::Value::String(s) => s,
+                    serde_yml::Value::Number(n) => n.to_string(),
+                    serde_yml::Value::Bool(b) => b.to_string(),
                     _ => format!("{k:?}"),
                 };
                 obj.insert(key, yaml_to_json(v)?);
             }
             Ok(Value::Object(obj))
         }
-        serde_yaml::Value::Tagged(tagged) => yaml_to_json(tagged.value),
+        serde_yml::Value::Tagged(tagged) => yaml_to_json(tagged.value),
     }
 }
 

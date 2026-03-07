@@ -26,6 +26,12 @@ pub enum PickError {
     #[error("could not detect input format")]
     UnknownFormat,
 
+    #[error("input too large (max {} bytes)", .0)]
+    InputTooLarge(u64),
+
+    #[error("too many results (max {0})")]
+    TooManyResults(usize),
+
     #[error("{0}")]
     Io(#[from] std::io::Error),
 }
