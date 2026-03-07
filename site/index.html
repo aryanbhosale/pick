@@ -158,8 +158,10 @@
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      background: var(--border);
     }
+    .terminal-dot:nth-child(1) { background: #ff5f57; }
+    .terminal-dot:nth-child(2) { background: #febc2e; }
+    .terminal-dot:nth-child(3) { background: #28c840; }
     .terminal-bar span {
       color: var(--muted);
       font-size: 12px;
@@ -168,18 +170,19 @@
     .terminal-bar .copy-term {
       margin-left: auto;
       background: none;
-      border: 1px solid var(--border);
-      border-radius: 4px;
+      border: none;
       color: var(--muted);
-      font-size: 12px;
-      padding: 2px 10px;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: color 0.15s;
+      padding: 4px;
+      display: flex;
+      align-items: center;
     }
-    .terminal-bar .copy-term:hover {
-      color: var(--fg);
-      border-color: var(--muted);
-    }
+    .terminal-bar .copy-term:hover { color: var(--fg); }
+    .terminal-bar .copy-term svg { width: 16px; height: 16px; }
+    .terminal-bar .copy-term.copied svg.icon-copy { display: none; }
+    .terminal-bar .copy-term svg.icon-check { display: none; color: var(--green); }
+    .terminal-bar .copy-term.copied svg.icon-check { display: block; }
     .terminal-body {
       padding: 20px 24px;
       font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
@@ -350,7 +353,7 @@
         <div class="terminal-dot"></div>
         <div class="terminal-dot"></div>
         <span>Terminal</span>
-        <button class="copy-term" onclick="copyBlock(this)">Copy</button>
+        <button class="copy-term" onclick="copyBlock(this)"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button>
       </div>
       <div class="terminal-body">
 <span class="line"><span class="comment"># JSON</span></span>
@@ -476,7 +479,7 @@
         <div class="terminal-dot"></div>
         <div class="terminal-dot"></div>
         <div class="terminal-dot"></div>
-        <button class="copy-term" onclick="copyBlock(this)">Copy</button>
+        <button class="copy-term" onclick="copyBlock(this)"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button>
       </div>
       <div class="terminal-body">
 <span class="line"><span class="comment"># npm (macOS, Linux, Windows)</span></span>
@@ -523,8 +526,8 @@ function copyBlock(btn) {
   const cmds = body.querySelectorAll('.cmd');
   const text = Array.from(cmds).map(c => c.textContent).join('\n');
   navigator.clipboard.writeText(text);
-  btn.textContent = 'Copied!';
-  setTimeout(() => btn.textContent = 'Copy', 1500);
+  btn.classList.add('copied');
+  setTimeout(() => btn.classList.remove('copied'), 1500);
   showToast();
 }
 
