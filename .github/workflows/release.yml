@@ -49,6 +49,12 @@ jobs:
         if: matrix.cross
         run: cargo install cross --git https://github.com/cross-rs/cross
 
+      - name: Set version from tag
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          sed -i.bak "s/^version = \".*\"/version = \"${VERSION}\"/" Cargo.toml && rm -f Cargo.toml.bak
+          echo "Building version $VERSION"
+
       - name: Build
         run: |
           if [ "${{ matrix.cross }}" = "true" ]; then
@@ -85,10 +91,11 @@ jobs:
         with:
           path: artifacts
 
-      - name: Sync versions from Cargo.toml
+      - name: Sync versions from tag
         run: |
-          VERSION=$(grep '^version' Cargo.toml | head -1 | sed 's/.*"\(.*\)"/\1/')
+          VERSION=${GITHUB_REF_NAME#v}
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "Publishing version $VERSION"
 
           for pkg_dir in npm/pick-cli*/; do
             sed -i "s/\"version\": \".*\"/\"version\": \"${VERSION}\"/" "$pkg_dir/package.json"
