@@ -165,6 +165,21 @@
       font-size: 12px;
       margin-left: 8px;
     }
+    .terminal-bar .copy-term {
+      margin-left: auto;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 2px 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .terminal-bar .copy-term:hover {
+      color: var(--fg);
+      border-color: var(--muted);
+    }
     .terminal-body {
       padding: 20px 24px;
       font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
@@ -173,9 +188,30 @@
       overflow-x: auto;
     }
     .terminal-body .prompt { color: var(--green); }
-    .terminal-body .cmd { color: var(--fg); }
+    .terminal-body .cmd { color: var(--fg); cursor: pointer; border-radius: 3px; transition: background 0.15s; }
+    .terminal-body .cmd:hover { background: rgba(255,255,255,0.06); }
     .terminal-body .comment { color: var(--muted); }
     .terminal-body .output { color: #a1a1aa; }
+    .copied-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--green);
+      color: #000;
+      padding: 8px 16px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.2s;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .copied-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
     /* Sections */
     section {
@@ -312,6 +348,7 @@
         <div class="terminal-dot"></div>
         <div class="terminal-dot"></div>
         <span>Terminal</span>
+        <button class="copy-term" onclick="copyBlock(this)">Copy</button>
       </div>
       <div class="terminal-body">
 <span class="comment"># JSON</span>
@@ -437,6 +474,7 @@
         <div class="terminal-dot"></div>
         <div class="terminal-dot"></div>
         <div class="terminal-dot"></div>
+        <button class="copy-term" onclick="copyBlock(this)">Copy</button>
       </div>
       <div class="terminal-body">
 <span class="comment"># npm (macOS, Linux, Windows)</span>
@@ -461,13 +499,40 @@
   </div>
 </footer>
 
+<div class="copied-toast" id="toast">Copied!</div>
+
 <script>
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1200);
+}
+
 function copy() {
   navigator.clipboard.writeText('npm install -g @aryanbhosale/pick');
   const btn = document.getElementById('copy-btn');
   btn.textContent = 'Copied!';
   setTimeout(() => btn.textContent = 'Copy', 1500);
+  showToast();
 }
+
+function copyBlock(btn) {
+  const body = btn.closest('.terminal').querySelector('.terminal-body');
+  const cmds = body.querySelectorAll('.cmd');
+  const text = Array.from(cmds).map(c => c.textContent).join('\n');
+  navigator.clipboard.writeText(text);
+  btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = 'Copy', 1500);
+  showToast();
+}
+
+document.querySelectorAll('.terminal-body .cmd').forEach(cmd => {
+  cmd.title = 'Click to copy';
+  cmd.addEventListener('click', () => {
+    navigator.clipboard.writeText(cmd.textContent);
+    showToast();
+  });
+});
 </script>
 
 </body>
