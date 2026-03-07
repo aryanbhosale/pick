@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Extract values from anything — JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV, and more",
   "license": "MIT",
+  "homepage": "https://pick-cli.pages.dev",
   "repository": {
     "type": "git",
     "url": "https://github.com/aryanbhosale/pick"
