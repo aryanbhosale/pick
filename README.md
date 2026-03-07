@@ -1,5 +1,9 @@
 # pick
 
+[![npm](https://img.shields.io/npm/v/@aryanbhosale/pick?color=blue&label=npm)](https://www.npmjs.com/package/@aryanbhosale/pick)
+[![CI](https://github.com/aryanbhosale/pick/actions/workflows/ci.yml/badge.svg)](https://github.com/aryanbhosale/pick/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 **[pick-cli.pages.dev](https://pick-cli.pages.dev)**
 
 Extract values from anything &mdash; JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV, and more.
