@@ -163,11 +163,7 @@ mod tests {
     #[test]
     fn run_json_wildcard() {
         let cli = make_cli(Some("items[*].name"));
-        let result = run(
-            &cli,
-            r#"{"items": [{"name": "a"}, {"name": "b"}]}"#,
-        )
-        .unwrap();
+        let result = run(&cli, r#"{"items": [{"name": "a"}, {"name": "b"}]}"#).unwrap();
         assert_eq!(result, "a\nb");
     }
 
@@ -199,11 +195,7 @@ mod tests {
     fn run_headers() {
         let mut cli = make_cli(Some("content-type"));
         cli.input = InputFormat::Headers;
-        let result = run(
-            &cli,
-            "Content-Type: application/json\nX-Request-Id: abc",
-        )
-        .unwrap();
+        let result = run(&cli, "Content-Type: application/json\nX-Request-Id: abc").unwrap();
         assert_eq!(result, "application/json");
     }
 

@@ -188,9 +188,7 @@ pub fn extract(value: &Value, selector: &Selector) -> Result<Vec<Value>, PickErr
                                 }
                             }
                             other => {
-                                return Err(PickError::NotAnArray(
-                                    value_type_name(other).into(),
-                                ));
+                                return Err(PickError::NotAnArray(value_type_name(other).into()));
                             }
                         },
                         Index::Wildcard => match v {
@@ -198,9 +196,7 @@ pub fn extract(value: &Value, selector: &Selector) -> Result<Vec<Value>, PickErr
                                 next_indexed.extend(arr.iter().cloned());
                             }
                             other => {
-                                return Err(PickError::NotAnArray(
-                                    value_type_name(other).into(),
-                                ));
+                                return Err(PickError::NotAnArray(value_type_name(other).into()));
                             }
                         },
                     }

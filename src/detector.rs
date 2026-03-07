@@ -111,9 +111,14 @@ fn looks_like_headers(lines: &[&str]) -> bool {
         }
     });
 
-    let uppercase_keys = relevant.iter().filter(|line| {
-        line.as_bytes().first().is_some_and(|b| b.is_ascii_uppercase())
-    }).count();
+    let uppercase_keys = relevant
+        .iter()
+        .filter(|line| {
+            line.as_bytes()
+                .first()
+                .is_some_and(|b| b.is_ascii_uppercase())
+        })
+        .count();
 
     has_hyphen_key || uppercase_keys as f64 / relevant.len() as f64 > 0.7
 }
@@ -198,7 +203,11 @@ fn looks_like_env(lines: &[&str]) -> bool {
 }
 
 fn looks_like_csv(lines: &[&str]) -> bool {
-    let non_empty: Vec<&str> = lines.iter().map(|l| l.trim()).filter(|l| !l.is_empty()).collect();
+    let non_empty: Vec<&str> = lines
+        .iter()
+        .map(|l| l.trim())
+        .filter(|l| !l.is_empty())
+        .collect();
 
     if non_empty.len() < 2 {
         return false;
@@ -265,12 +274,18 @@ mod tests {
 
     #[test]
     fn detect_json_whitespace() {
-        assert_eq!(detect_format("  \n  {\"key\": \"val\"}  "), InputFormat::Json);
+        assert_eq!(
+            detect_format("  \n  {\"key\": \"val\"}  "),
+            InputFormat::Json
+        );
     }
 
     #[test]
     fn detect_yaml_document() {
-        assert_eq!(detect_format("---\nname: Alice\nage: 30"), InputFormat::Yaml);
+        assert_eq!(
+            detect_format("---\nname: Alice\nage: 30"),
+            InputFormat::Yaml
+        );
     }
 
     #[test]
@@ -324,7 +339,9 @@ mod tests {
     #[test]
     fn detect_headers() {
         assert_eq!(
-            detect_format("Content-Type: application/json\nX-Request-Id: abc123\nCache-Control: no-cache"),
+            detect_format(
+                "Content-Type: application/json\nX-Request-Id: abc123\nCache-Control: no-cache"
+            ),
             InputFormat::Headers
         );
     }
@@ -377,6 +394,9 @@ mod tests {
 
     #[test]
     fn detect_plain_text() {
-        assert_eq!(detect_format("just some random text here"), InputFormat::Text);
+        assert_eq!(
+            detect_format("just some random text here"),
+            InputFormat::Text
+        );
     }
 }

@@ -48,11 +48,7 @@ fn detect_delimiter(input: &str) -> u8 {
     let commas = first_line.matches(',').count();
     let tabs = first_line.matches('\t').count();
 
-    if tabs > commas {
-        b'\t'
-    } else {
-        b','
-    }
+    if tabs > commas { b'\t' } else { b',' }
 }
 
 #[cfg(test)]
