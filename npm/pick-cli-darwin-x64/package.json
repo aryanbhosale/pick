@@ -1,5 +1,5 @@
 {
-  "name": "pick-cli-darwin-x64",
+  "name": "@aryanbhosale/pick-darwin-x64",
   "version": "0.1.0",
   "description": "pick binary for macOS x64 (Intel)",
   "license": "MIT",

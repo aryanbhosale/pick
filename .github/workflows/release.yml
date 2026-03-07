@@ -94,7 +94,7 @@ jobs:
             sed -i "s/\"version\": \".*\"/\"version\": \"${VERSION}\"/" "$pkg_dir/package.json"
           done
 
-          sed -i "s/\"pick-cli-\([^\"]*\)\": \"[^\"]*\"/\"pick-cli-\1\": \"${VERSION}\"/g" npm/pick-cli/package.json
+          sed -i "s/\"@aryanbhosale\/pick-\([^\"]*\)\": \"[^\"]*\"/\"@aryanbhosale\/pick-\1\": \"${VERSION}\"/g" npm/pick-cli/package.json
 
       - name: Stage binaries into npm packages
         run: |

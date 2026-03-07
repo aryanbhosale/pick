@@ -1,5 +1,5 @@
 {
-  "name": "pick-cli-darwin-arm64",
+  "name": "@aryanbhosale/pick-darwin-arm64",
   "version": "0.1.0",
   "description": "pick binary for macOS ARM64 (Apple Silicon)",
   "license": "MIT",

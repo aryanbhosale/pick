@@ -3,7 +3,7 @@
 Extract values from anything &mdash; JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV, and more.
 
 ```bash
-npm install -g pick-cli
+npm install -g @aryanbhosale/pick
 ```
 
 `pick` auto-detects the input format and lets you extract values using a simple selector syntax. No more juggling `jq`, `yq`, `grep`, `awk`, and `cut` for different formats.
@@ -134,7 +134,7 @@ Auto-detection works in most cases. Use `-i` to override when the input is ambig
 ### npm (recommended)
 
 ```bash
-npm install -g pick-cli
+npm install -g @aryanbhosale/pick
 ```
 
 This installs a native binary for your platform &mdash; macOS (ARM/x64), Linux (x64/ARM64), and Windows (x64).

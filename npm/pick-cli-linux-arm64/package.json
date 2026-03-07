@@ -1,5 +1,5 @@
 {
-  "name": "pick-cli-linux-arm64",
+  "name": "@aryanbhosale/pick-linux-arm64",
   "version": "0.1.0",
   "description": "pick binary for Linux ARM64",
   "license": "MIT",
