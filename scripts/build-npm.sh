@@ -31,7 +31,7 @@ for pkg_dir in "$NPM_DIR"/pick-cli*/; do
 done
 
 # Also update optionalDependencies versions in main package
-sed -i.bak "s/\"pick-cli-\([^\"]*\)\": \"[^\"]*\"/\"pick-cli-\1\": \"${VERSION}\"/g" "$NPM_DIR/pick-cli/package.json"
+sed -i.bak "s/\"@aryanbhosale\/pick-\([^\"]*\)\": \"[^\"]*\"/\"@aryanbhosale\/pick-\1\": \"${VERSION}\"/g" "$NPM_DIR/pick-cli/package.json"
 rm -f "$NPM_DIR/pick-cli/package.json.bak"
 
 build_platform() {

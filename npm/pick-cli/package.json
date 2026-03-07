@@ -1,5 +1,5 @@
 {
-  "name": "pick-cli",
+  "name": "@aryanbhosale/pick",
   "version": "0.1.0",
   "description": "Extract values from anything — JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV, and more",
   "license": "MIT",
@@ -27,10 +27,10 @@
     "bin"
   ],
   "optionalDependencies": {
-    "pick-cli-darwin-arm64": "0.1.0",
-    "pick-cli-darwin-x64": "0.1.0",
-    "pick-cli-linux-x64": "0.1.0",
-    "pick-cli-linux-arm64": "0.1.0",
-    "pick-cli-win32-x64": "0.1.0"
+    "@aryanbhosale/pick-darwin-arm64": "0.1.0",
+    "@aryanbhosale/pick-darwin-x64": "0.1.0",
+    "@aryanbhosale/pick-linux-x64": "0.1.0",
+    "@aryanbhosale/pick-linux-arm64": "0.1.0",
+    "@aryanbhosale/pick-win32-x64": "0.1.0"
   }
 }

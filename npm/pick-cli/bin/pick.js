@@ -5,11 +5,11 @@ const path = require("path");
 const fs = require("fs");
 
 const PLATFORMS = {
-  "darwin-arm64": "pick-cli-darwin-arm64",
-  "darwin-x64": "pick-cli-darwin-x64",
-  "linux-x64": "pick-cli-linux-x64",
-  "linux-arm64": "pick-cli-linux-arm64",
-  "win32-x64": "pick-cli-win32-x64",
+  "darwin-arm64": "@aryanbhosale/pick-darwin-arm64",
+  "darwin-x64": "@aryanbhosale/pick-darwin-x64",
+  "linux-x64": "@aryanbhosale/pick-linux-x64",
+  "linux-arm64": "@aryanbhosale/pick-linux-arm64",
+  "win32-x64": "@aryanbhosale/pick-win32-x64",
 };
 
 const platformKey = `${process.platform}-${process.arch}`;
@@ -49,11 +49,11 @@ function findBinary() {
       if (fs.existsSync(candidate)) {
         return candidate;
       }
-      // Also check if we're inside node_modules/pick-cli/bin already
-      // and the sibling package is at the same node_modules level
-      if (dir.endsWith(path.join("node_modules", "pick-cli"))) {
+      // Also check if we're inside node_modules/@aryanbhosale/pick/bin already
+      // and the sibling package is at the same scope level
+      if (dir.endsWith(path.join("node_modules", "@aryanbhosale", "pick"))) {
         const sibling = path.join(
-          path.dirname(dir), pkgName, "bin", binName
+          path.dirname(dir), path.basename(pkgName), "bin", binName
         );
         if (fs.existsSync(sibling)) {
           return sibling;

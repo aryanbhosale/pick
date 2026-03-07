@@ -1,5 +1,5 @@
 {
-  "name": "pick-cli-win32-x64",
+  "name": "@aryanbhosale/pick-win32-x64",
   "version": "0.1.0",
   "description": "pick binary for Windows x64",
   "license": "MIT",
