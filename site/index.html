@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>pick — Extract values from anything</title>
+  <meta name="description" content="A universal CLI tool to extract values from JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV, and more.">
+  <meta property="og:title" content="pick — Extract values from anything">
+  <meta property="og:description" content="One tool to replace jq, yq, grep, awk, and cut. Auto-detects format, simple selector syntax.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pick.aryan.sh">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%E2%9E%9C</text></svg>">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --fg: #e4e4e7;
+      --muted: #71717a;
+      --accent: #3b82f6;
+      --green: #22c55e;
+      --surface: #18181b;
+      --border: #27272a;
+      --code-bg: #111113;
+      --radius: 8px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Nav */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    nav .logo {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--fg);
+      text-decoration: none;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    }
+    nav .links {
+      display: flex;
+      gap: 24px;
+    }
+    nav .links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.15s;
+    }
+    nav .links a:hover { color: var(--fg); }
+
+    /* Hero */
+    .hero {
+      padding: 80px 0 60px;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 48px;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero p {
+      color: var(--muted);
+      font-size: 18px;
+      max-width: 500px;
+      margin: 0 auto 32px;
+    }
+
+    /* Install box */
+    .install {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .install code {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 20px;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 15px;
+      color: var(--green);
+      user-select: all;
+    }
+    .install button {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all 0.15s;
+      font-size: 14px;
+    }
+    .install button:hover {
+      color: var(--fg);
+      border-color: var(--muted);
+    }
+    .hero .sub {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Demo */
+    .demo {
+      padding: 40px 0 60px;
+    }
+    .terminal {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .terminal-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+    .terminal-bar span {
+      color: var(--muted);
+      font-size: 12px;
+      margin-left: 8px;
+    }
+    .terminal-body {
+      padding: 20px 24px;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 14px;
+      line-height: 1.8;
+      overflow-x: auto;
+    }
+    .terminal-body .prompt { color: var(--green); }
+    .terminal-body .cmd { color: var(--fg); }
+    .terminal-body .comment { color: var(--muted); }
+    .terminal-body .output { color: #a1a1aa; }
+
+    /* Sections */
+    section {
+      padding: 60px 0;
+      border-top: 1px solid var(--border);
+    }
+    section h2 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 32px;
+    }
+
+    /* Format grid */
+    .formats {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .format-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .format-card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .format-card p {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Selectors */
+    .selector-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .selector-table td {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+    }
+    .selector-table td:first-child {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      color: var(--accent);
+      width: 220px;
+      font-size: 14px;
+    }
+    .selector-table td:last-child {
+      color: var(--muted);
+    }
+
+    /* Flags */
+    .flag-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .flag {
+      padding: 12px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .flag code {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 13px;
+      color: var(--accent);
+    }
+    .flag p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    /* Footer */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+    footer a:hover { color: var(--fg); }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 32px; }
+      .hero p { font-size: 16px; }
+      .flag-grid { grid-template-columns: 1fr; }
+      .install code { font-size: 13px; padding: 10px 14px; }
+      .terminal-body { font-size: 12px; padding: 16px; }
+      .selector-table td:first-child { width: 160px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="/" class="logo">pick</a>
+    <div class="links">
+      <a href="https://github.com/aryanbhosale/pick">GitHub</a>
+      <a href="https://github.com/aryanbhosale/pick/blob/main/CONTRIBUTING.md">Contribute</a>
+      <a href="https://www.npmjs.com/package/@aryanbhosale/pick">npm</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+  <div class="hero">
+    <h1>Extract values from <span>anything</span></h1>
+    <p>One tool to replace jq, yq, grep, awk, and cut. Auto-detects format. Simple selectors.</p>
+    <div class="install">
+      <code id="install-cmd">npm install -g @aryanbhosale/pick</code>
+      <button onclick="copy()" id="copy-btn" title="Copy to clipboard">Copy</button>
+    </div>
+    <div class="sub">macOS, Linux, Windows &middot; MIT License</div>
+  </div>
+
+  <div class="demo">
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="terminal-dot"></div>
+        <div class="terminal-dot"></div>
+        <div class="terminal-dot"></div>
+        <span>Terminal</span>
+      </div>
+      <div class="terminal-body">
+<span class="comment"># JSON</span>
+<span class="prompt">$</span> <span class="cmd">curl -s api.github.com/users/octocat | pick login</span>
+<span class="output">octocat</span>
+
+<span class="comment"># .env</span>
+<span class="prompt">$</span> <span class="cmd">cat .env | pick DATABASE_URL</span>
+<span class="output">postgres://localhost:5432/mydb</span>
+
+<span class="comment"># YAML</span>
+<span class="prompt">$</span> <span class="cmd">cat config.yaml | pick server.port</span>
+<span class="output">8080</span>
+
+<span class="comment"># HTTP headers</span>
+<span class="prompt">$</span> <span class="cmd">curl -sI example.com | pick content-type</span>
+<span class="output">text/html; charset=UTF-8</span>
+
+<span class="comment"># CSV</span>
+<span class="prompt">$</span> <span class="cmd">cat users.csv | pick '[0].name'</span>
+<span class="output">Alice</span>
+
+<span class="comment"># logfmt</span>
+<span class="prompt">$</span> <span class="cmd">echo 'level=info status=200' | pick status</span>
+<span class="output">200</span>
+      </div>
+    </div>
+  </div>
+
+  <section>
+    <h2>8 formats, zero config</h2>
+    <div class="formats">
+      <div class="format-card">
+        <h3>JSON</h3>
+        <p>Objects, arrays, nested structures</p>
+      </div>
+      <div class="format-card">
+        <h3>YAML</h3>
+        <p>Config files, Kubernetes manifests</p>
+      </div>
+      <div class="format-card">
+        <h3>TOML</h3>
+        <p>Cargo.toml, pyproject.toml</p>
+      </div>
+      <div class="format-card">
+        <h3>.env</h3>
+        <p>Environment variable files</p>
+      </div>
+      <div class="format-card">
+        <h3>HTTP Headers</h3>
+        <p>curl -I output, response headers</p>
+      </div>
+      <div class="format-card">
+        <h3>logfmt</h3>
+        <p>Structured log lines</p>
+      </div>
+      <div class="format-card">
+        <h3>CSV / TSV</h3>
+        <p>Tabular data with headers</p>
+      </div>
+      <div class="format-card">
+        <h3>Plain text</h3>
+        <p>Key-value fallback and substring search</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Selector syntax</h2>
+    <table class="selector-table">
+      <tr><td>foo</td><td>Top-level key</td></tr>
+      <tr><td>foo.bar</td><td>Nested key</td></tr>
+      <tr><td>foo[0]</td><td>Array index</td></tr>
+      <tr><td>foo[-1]</td><td>Last element</td></tr>
+      <tr><td>foo[*].name</td><td>Pluck field from all elements</td></tr>
+      <tr><td>[0]</td><td>Index into root array</td></tr>
+      <tr><td>"dotted.key".sub</td><td>Quoted key for dots in names</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Flags</h2>
+    <div class="flag-grid">
+      <div class="flag">
+        <code>-i, --input &lt;format&gt;</code>
+        <p>Force input format</p>
+      </div>
+      <div class="flag">
+        <code>-f, --file &lt;path&gt;</code>
+        <p>Read from file instead of stdin</p>
+      </div>
+      <div class="flag">
+        <code>--json</code>
+        <p>Output as JSON</p>
+      </div>
+      <div class="flag">
+        <code>--lines</code>
+        <p>One element per line</p>
+      </div>
+      <div class="flag">
+        <code>-1, --first</code>
+        <p>Only first result</p>
+      </div>
+      <div class="flag">
+        <code>-d, --default &lt;val&gt;</code>
+        <p>Fallback value</p>
+      </div>
+      <div class="flag">
+        <code>-e, --exists</code>
+        <p>Exit code only (0/1)</p>
+      </div>
+      <div class="flag">
+        <code>-c, --count</code>
+        <p>Count matches</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Install</h2>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="terminal-dot"></div>
+        <div class="terminal-dot"></div>
+        <div class="terminal-dot"></div>
+      </div>
+      <div class="terminal-body">
+<span class="comment"># npm (macOS, Linux, Windows)</span>
+<span class="prompt">$</span> <span class="cmd">npm install -g @aryanbhosale/pick</span>
+
+<span class="comment"># from source (Rust 1.85+)</span>
+<span class="prompt">$</span> <span class="cmd">git clone https://github.com/aryanbhosale/pick.git</span>
+<span class="prompt">$</span> <span class="cmd">cd pick && cargo install --path .</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="container">
+    <a href="https://github.com/aryanbhosale/pick">GitHub</a> &middot;
+    <a href="https://www.npmjs.com/package/@aryanbhosale/pick">npm</a> &middot;
+    <a href="https://github.com/aryanbhosale/pick/issues">Issues</a> &middot;
+    MIT License
+  </div>
+</footer>
+
+<script>
+function copy() {
+  navigator.clipboard.writeText('npm install -g @aryanbhosale/pick');
+  const btn = document.getElementById('copy-btn');
+  btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = 'Copy', 1500);
+}
+</script>
+
+</body>
+</html>
