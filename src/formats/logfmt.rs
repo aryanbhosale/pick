@@ -5,10 +5,7 @@ pub fn parse(input: &str) -> Result<Value, PickError> {
     let lines: Vec<&str> = input.lines().filter(|l| !l.trim().is_empty()).collect();
 
     if lines.is_empty() {
-        return Err(PickError::ParseError(
-            "logfmt".into(),
-            "empty input".into(),
-        ));
+        return Err(PickError::ParseError("logfmt".into(), "empty input".into()));
     }
 
     if lines.len() == 1 {
@@ -28,9 +25,7 @@ fn parse_line(line: &str) -> Result<serde_json::Map<String, Value>, PickError> {
 
     while !remaining.is_empty() {
         // Parse key
-        let key_end = remaining
-            .find(['=', ' '])
-            .unwrap_or(remaining.len());
+        let key_end = remaining.find(['=', ' ']).unwrap_or(remaining.len());
         let key = &remaining[..key_end];
 
         if key.is_empty() {

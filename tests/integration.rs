@@ -610,7 +610,8 @@ fn curl_headers_style() {
 
 #[test]
 fn log_style() {
-    let input = "ts=2024-01-15T10:30:00Z level=info msg=\"request handled\" duration=0.5ms status=200";
+    let input =
+        "ts=2024-01-15T10:30:00Z level=info msg=\"request handled\" duration=0.5ms status=200";
     pick()
         .args(["duration", "-i", "logfmt"])
         .write_stdin(input)
