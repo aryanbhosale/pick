@@ -1,0 +1,18 @@
+server:
+  host: 0.0.0.0
+  port: 8080
+  workers: 4
+
+database:
+  host: db.internal
+  port: 5432
+  name: myapp
+  pool_size: 10
+
+redis:
+  url: redis://cache.internal:6379
+  ttl: 3600
+
+logging:
+  level: info
+  format: json

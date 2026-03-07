@@ -1,0 +1,5 @@
+name,email,role,active
+Alice,alice@example.com,admin,true
+Bob,bob@example.com,developer,true
+Charlie,charlie@example.com,designer,false
+Diana,diana@example.com,developer,true

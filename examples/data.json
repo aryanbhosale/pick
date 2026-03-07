@@ -1,0 +1,11 @@
+{
+  "users": [
+    {"name": "Alice", "age": 30, "role": "admin"},
+    {"name": "Bob", "age": 25, "role": "developer"},
+    {"name": "Charlie", "age": 35, "role": "designer"}
+  ],
+  "meta": {
+    "total": 3,
+    "page": 1
+  }
+}

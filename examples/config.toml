@@ -1,0 +1,13 @@
+[package]
+name = "myapp"
+version = "2.4.1"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+axum = "0.7"
+
+[profile.release]
+opt-level = 3
+lto = true
