@@ -47,7 +47,7 @@ jobs:
 
       - name: Install cross
         if: matrix.cross
-        run: cargo install cross
+        uses: cross-rs/cross-action@v1
 
       - name: Build
         run: |
@@ -59,6 +59,7 @@ jobs:
 
       - name: Stage binary for npm
         run: |
+          mkdir -p npm/${{ matrix.npm_pkg }}/bin
           cp target/${{ matrix.target }}/release/${{ matrix.bin }} npm/${{ matrix.npm_pkg }}/bin/${{ matrix.bin }}
           chmod +x npm/${{ matrix.npm_pkg }}/bin/${{ matrix.bin }}
 
@@ -99,6 +100,7 @@ jobs:
         run: |
           for artifact_dir in artifacts/pick-cli-*/; do
             pkg_name=$(basename "$artifact_dir")
+            mkdir -p "npm/$pkg_name/bin"
             cp -r "$artifact_dir"/bin/* "npm/$pkg_name/bin/"
             chmod +x npm/$pkg_name/bin/*
           done
