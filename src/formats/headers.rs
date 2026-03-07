@@ -15,7 +15,17 @@ pub fn parse(input: &str) -> Result<Value, PickError> {
         if let Some(colon_pos) = line.find(':') {
             let key = line[..colon_pos].trim().to_lowercase();
             let value = line[colon_pos + 1..].trim();
-            map.insert(key, Value::String(value.to_string()));
+            match map.entry(key) {
+                serde_json::map::Entry::Occupied(mut e) => {
+                    if let Value::String(existing) = e.get() {
+                        let combined = format!("{}, {}", existing, value);
+                        e.insert(Value::String(combined));
+                    }
+                }
+                serde_json::map::Entry::Vacant(e) => {
+                    e.insert(Value::String(value.to_string()));
+                }
+            }
         }
     }
 

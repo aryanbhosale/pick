@@ -5,6 +5,8 @@ use std::process;
 use pick::cli::Cli;
 use pick::error::PickError;
 
+const MAX_INPUT_SIZE: u64 = 100 * 1024 * 1024; // 100 MB
+
 fn main() {
     let cli = Cli::parse();
 
@@ -34,6 +36,10 @@ fn run_main(cli: &Cli) -> Result<String, PickError> {
 
 fn read_input(cli: &Cli) -> Result<String, PickError> {
     if let Some(ref path) = cli.file {
+        let metadata = std::fs::metadata(path).map_err(PickError::Io)?;
+        if metadata.len() > MAX_INPUT_SIZE {
+            return Err(PickError::InputTooLarge(MAX_INPUT_SIZE));
+        }
         return std::fs::read_to_string(path).map_err(PickError::Io);
     }
 
@@ -42,6 +48,11 @@ fn read_input(cli: &Cli) -> Result<String, PickError> {
     }
 
     let mut buf = String::new();
-    io::stdin().read_to_string(&mut buf)?;
+    io::stdin()
+        .take(MAX_INPUT_SIZE + 1)
+        .read_to_string(&mut buf)?;
+    if buf.len() as u64 > MAX_INPUT_SIZE {
+        return Err(PickError::InputTooLarge(MAX_INPUT_SIZE));
+    }
     Ok(buf)
 }

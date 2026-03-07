@@ -47,6 +47,7 @@ fn parse_line(line: &str) -> Result<serde_json::Map<String, Value>, PickError> {
                 let mut value = String::new();
                 let mut chars = remaining.chars();
                 let mut consumed = 0;
+                let mut found_close = false;
 
                 while let Some(c) = chars.next() {
                     consumed += c.len_utf8();
@@ -66,10 +67,18 @@ fn parse_line(line: &str) -> Result<serde_json::Map<String, Value>, PickError> {
                             }
                         }
                     } else if c == '"' {
+                        found_close = true;
                         break;
                     } else {
                         value.push(c);
                     }
+                }
+
+                if !found_close {
+                    return Err(PickError::ParseError(
+                        "logfmt".into(),
+                        "unterminated quoted value".into(),
+                    ));
                 }
 
                 map.insert(key.to_string(), Value::String(value));
