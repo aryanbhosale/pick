@@ -363,9 +363,16 @@ jobs:
           # Install wingetcreate
           Invoke-WebRequest -Uri https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe
 
-          # Submit update to winget-pkgs
+          # Try update first (existing package), fall back to new (first submission)
           .\wingetcreate.exe update aryanbhosale.pick `
             --version $version `
             --urls $url `
             --token $env:WINGET_GITHUB_TOKEN `
-            --submit
+            --submit 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "Update failed, trying new submission..."
+            .\wingetcreate.exe new $url `
+              --version $version `
+              --token $env:WINGET_GITHUB_TOKEN `
+              --submit
+          }
