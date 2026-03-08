@@ -287,13 +287,12 @@ jobs:
         id: build
 
       - name: Publish to Snap Store
-        uses: snapcore/action-publish@v1
         continue-on-error: true
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
-        with:
-          snap: ${{ steps.build.outputs.snap }}
-          release: stable
+        run: |
+          sudo snap install snapcraft --classic
+          snapcraft upload --release=stable ${{ steps.build.outputs.snap }}
 
   # ── 6. Chocolatey ───────────────────────────────────────────────────
   publish-choco:
