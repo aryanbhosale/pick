@@ -295,6 +295,38 @@
       margin-top: 4px;
     }
 
+    /* Install grid */
+    .install-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .install-method {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .install-method h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .install-method p {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .install-method code {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 12px;
+      color: var(--green);
+      cursor: pointer;
+      border-radius: 3px;
+      transition: background 0.15s;
+    }
+    .install-method code:hover { background: rgba(255,255,255,0.06); }
+
     /* Footer */
     footer {
       padding: 40px 0;
@@ -314,6 +346,7 @@
       .hero h1 { font-size: 32px; }
       .hero p { font-size: 16px; }
       .flag-grid { grid-template-columns: 1fr; }
+      .install-grid { grid-template-columns: 1fr; }
       .install code { font-size: 13px; padding: 10px 14px; }
       .terminal-body { font-size: 12px; padding: 16px; }
       .selector-table td:first-child { width: 160px; }
@@ -327,7 +360,7 @@
     <a href="/" class="logo">pick</a>
     <div class="links">
       <a href="https://github.com/aryanbhosale/pick">GitHub</a>
-      <a href="https://github.com/aryanbhosale/pick/blob/main/CONTRIBUTING.md">Contribute</a>
+      <a href="https://crates.io/crates/pick-cli">crates.io</a>
       <a href="https://www.npmjs.com/package/@aryanbhosale/pick">npm</a>
       <a href="https://github.com/sponsors/aryanbhosale" class="sponsor-link">Sponsor</a>
     </div>
@@ -340,10 +373,10 @@
     <h1>Extract values from <span>anything</span></h1>
     <p>One tool to replace jq, yq, grep, awk, and cut. Auto-detects format. Simple selectors.</p>
     <div class="install">
-      <code id="install-cmd">npm install -g @aryanbhosale/pick</code>
+      <code id="install-cmd">cargo install pick-cli</code>
       <button onclick="copy()" id="copy-btn" title="Copy to clipboard">Copy</button>
     </div>
-    <div class="sub">macOS, Linux, Windows &middot; MIT License</div>
+    <div class="sub">macOS, Linux, Windows &middot; MIT License &middot; <a href="#install-section" style="color:var(--accent);text-decoration:none">all install methods</a></div>
   </div>
 
   <div class="demo">
@@ -472,22 +505,48 @@
     </div>
   </section>
 
-  <section>
+  <section id="install-section">
     <h2>Install</h2>
-    <div class="terminal">
-      <div class="terminal-bar">
-        <div class="terminal-dot"></div>
-        <div class="terminal-dot"></div>
-        <div class="terminal-dot"></div>
-        <button class="copy-term" onclick="copyBlock(this)"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button>
+    <div class="install-grid">
+      <div class="install-method">
+        <h3>Cargo</h3>
+        <p>Rust ecosystem</p>
+        <code class="cmd">cargo install pick-cli</code>
       </div>
-      <div class="terminal-body">
-<span class="line"><span class="comment"># npm (macOS, Linux, Windows)</span></span>
-<span class="line"><span class="prompt">$</span> <span class="cmd">npm install -g @aryanbhosale/pick</span></span>
-
-<span class="line gap"><span class="comment"># from source (Rust 1.85+)</span></span>
-<span class="line"><span class="prompt">$</span> <span class="cmd">git clone https://github.com/aryanbhosale/pick.git</span></span>
-<span class="line"><span class="prompt">$</span> <span class="cmd">cd pick && cargo install --path .</span></span>
+      <div class="install-method">
+        <h3>Homebrew</h3>
+        <p>macOS &amp; Linux</p>
+        <code class="cmd">brew install aryanbhosale/pick/pick</code>
+      </div>
+      <div class="install-method">
+        <h3>npm</h3>
+        <p>Node.js ecosystem</p>
+        <code class="cmd">npm install -g @aryanbhosale/pick</code>
+      </div>
+      <div class="install-method">
+        <h3>Snap</h3>
+        <p>Linux</p>
+        <code class="cmd">snap install pick-cli</code>
+      </div>
+      <div class="install-method">
+        <h3>Chocolatey</h3>
+        <p>Windows</p>
+        <code class="cmd">choco install pick</code>
+      </div>
+      <div class="install-method">
+        <h3>WinGet</h3>
+        <p>Windows</p>
+        <code class="cmd">winget install aryanbhosale.pick</code>
+      </div>
+      <div class="install-method">
+        <h3>Docker</h3>
+        <p>Any platform</p>
+        <code class="cmd">docker run -i ghcr.io/aryanbhosale/pick</code>
+      </div>
+      <div class="install-method">
+        <h3>GitHub Releases</h3>
+        <p>Pre-built binaries</p>
+        <a href="https://github.com/aryanbhosale/pick/releases" style="color:var(--accent);font-size:13px;font-family:'SF Mono','Fira Code','Consolas',monospace">Download &rarr;</a>
       </div>
     </div>
   </section>
@@ -497,7 +556,9 @@
 <footer>
   <div class="container">
     <a href="https://github.com/aryanbhosale/pick">GitHub</a> &middot;
+    <a href="https://crates.io/crates/pick-cli">crates.io</a> &middot;
     <a href="https://www.npmjs.com/package/@aryanbhosale/pick">npm</a> &middot;
+    <a href="https://snapcraft.io/pick-cli">Snap Store</a> &middot;
     <a href="https://github.com/aryanbhosale/pick/issues">Issues</a> &middot;
     <a href="https://github.com/sponsors/aryanbhosale">Sponsor</a> &middot;
     MIT License
@@ -514,7 +575,7 @@ function showToast() {
 }
 
 function copy() {
-  navigator.clipboard.writeText('npm install -g @aryanbhosale/pick');
+  navigator.clipboard.writeText('cargo install pick-cli');
   const btn = document.getElementById('copy-btn');
   btn.textContent = 'Copied!';
   setTimeout(() => btn.textContent = 'Copy', 1500);
@@ -530,6 +591,14 @@ function copyBlock(btn) {
   setTimeout(() => btn.classList.remove('copied'), 1500);
   showToast();
 }
+
+document.querySelectorAll('.install-method code').forEach(cmd => {
+  cmd.title = 'Click to copy';
+  cmd.addEventListener('click', () => {
+    navigator.clipboard.writeText(cmd.textContent);
+    showToast();
+  });
+});
 
 document.querySelectorAll('.terminal-body .cmd').forEach(cmd => {
   cmd.title = 'Click to copy';
