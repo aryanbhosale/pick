@@ -159,7 +159,7 @@ npm install -g @aryanbhosale/pick
 ### Snap (Linux)
 
 ```bash
-snap install pick
+snap install pick-cli
 ```
 
 ### Chocolatey (Windows)

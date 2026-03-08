@@ -1,4 +1,4 @@
-name: pick
+name: pick-cli
 version: git
 summary: Extract values from anything
 description: |
