@@ -372,7 +372,9 @@ jobs:
           if ($LASTEXITCODE -ne 0) {
             Write-Host "Update failed, trying new submission..."
             .\wingetcreate.exe new $url `
-              --version $version `
+              --out manifests `
+              --token $env:WINGET_GITHUB_TOKEN
+            .\wingetcreate.exe submit `
               --token $env:WINGET_GITHUB_TOKEN `
-              --submit
+              manifests
           }
