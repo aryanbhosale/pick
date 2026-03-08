@@ -1,5 +1,6 @@
 # pick
 
+[![crates.io](https://img.shields.io/crates/v/pick-cli?color=orange&label=crates.io)](https://crates.io/crates/pick-cli)
 [![npm](https://img.shields.io/npm/v/@aryanbhosale/pick?color=blue&label=npm)](https://www.npmjs.com/package/@aryanbhosale/pick)
 [![CI](https://github.com/aryanbhosale/pick/actions/workflows/ci.yml/badge.svg)](https://github.com/aryanbhosale/pick/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
@@ -9,7 +10,7 @@
 Extract values from anything &mdash; JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV, and more.
 
 ```bash
-npm install -g @aryanbhosale/pick
+cargo install pick-cli
 ```
 
 `pick` auto-detects the input format and lets you extract values using a simple selector syntax. No more juggling `jq`, `yq`, `grep`, `awk`, and `cut` for different formats.
@@ -137,13 +138,51 @@ Auto-detection works in most cases. Use `-i` to override when the input is ambig
 
 ## Install
 
-### npm (recommended)
+### Cargo (Rust)
+
+```bash
+cargo install pick-cli
+```
+
+### Homebrew (macOS/Linux)
+
+```bash
+brew install aryanbhosale/pick/pick
+```
+
+### npm
 
 ```bash
 npm install -g @aryanbhosale/pick
 ```
 
-This installs a native binary for your platform &mdash; macOS (ARM/x64), Linux (x64/ARM64), and Windows (x64).
+### Snap (Linux)
+
+```bash
+snap install pick
+```
+
+### Chocolatey (Windows)
+
+```powershell
+choco install pick
+```
+
+### WinGet (Windows)
+
+```powershell
+winget install aryanbhosale.pick
+```
+
+### Docker
+
+```bash
+echo '{"foo":"bar"}' | docker run -i ghcr.io/aryanbhosale/pick foo
+```
+
+### GitHub Releases
+
+Download pre-built binaries from [Releases](https://github.com/aryanbhosale/pick/releases) &mdash; macOS (ARM/x64), Linux (x64/ARM64), and Windows (x64).
 
 ### From source
 

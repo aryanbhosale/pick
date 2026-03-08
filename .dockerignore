@@ -1,0 +1,10 @@
+target/
+npm/
+snap/
+choco/
+dist/
+.github/
+.git/
+tests/
+website/
+*.md

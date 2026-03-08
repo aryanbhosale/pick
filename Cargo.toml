@@ -1,9 +1,32 @@
 [package]
-name = "pick"
+name = "pick-cli"
 version = "0.1.2"
 edition = "2024"
-description = "Extract values from anything"
+description = "Extract values from anything — JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV, and more"
 license = "MIT"
+repository = "https://github.com/aryanbhosale/pick"
+homepage = "https://pick-cli.pages.dev"
+readme = "README.md"
+keywords = ["cli", "json", "yaml", "extract", "parser"]
+categories = ["command-line-utilities", "parsing"]
+exclude = [
+    "npm/",
+    "snap/",
+    "choco/",
+    "dist/",
+    ".github/",
+    "tests/",
+    "website/",
+    "MARKETING.md",
+]
+
+[lib]
+name = "pick"
+path = "src/lib.rs"
+
+[[bin]]
+name = "pick"
+path = "src/main.rs"
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }

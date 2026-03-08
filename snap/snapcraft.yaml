@@ -1,0 +1,25 @@
+name: pick
+version: git
+summary: Extract values from anything
+description: |
+  pick auto-detects the input format and lets you extract values
+  using a simple selector syntax. Supports JSON, YAML, TOML, .env,
+  HTTP headers, logfmt, CSV, and more.
+
+  No more juggling jq, yq, grep, awk, and cut for different formats.
+
+base: core22
+grade: stable
+confinement: strict
+
+parts:
+  pick:
+    plugin: rust
+    source: .
+
+apps:
+  pick:
+    command: bin/pick
+    plugs:
+      - home
+      - removable-media

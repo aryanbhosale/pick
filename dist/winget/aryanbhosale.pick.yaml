@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.singleton.1.6.0.schema.json
+PackageIdentifier: aryanbhosale.pick
+PackageVersion: "$VERSION$"
+PackageLocale: en-US
+Publisher: Aryan Bhosale
+PublisherUrl: https://github.com/aryanbhosale
+PackageName: pick
+PackageUrl: https://pick-cli.pages.dev
+License: MIT
+LicenseUrl: https://github.com/aryanbhosale/pick/blob/main/LICENSE
+ShortDescription: Extract values from anything
+Description: Extract values from anything — JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV, and more.
+Tags:
+  - cli
+  - json
+  - yaml
+  - toml
+  - parser
+  - extract
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/aryanbhosale/pick/releases/download/v$VERSION$/pick-v$VERSION$-x86_64-pc-windows-gnu.zip
+    InstallerSha256: "$SHA256$"
+    InstallerType: zip
+    NestedInstallerType: portable
+    NestedInstallerFiles:
+      - RelativeFilePath: pick.exe
+ManifestType: singleton
+ManifestVersion: 1.6.0
