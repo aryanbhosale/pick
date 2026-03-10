@@ -8,8 +8,8 @@ PackageName: pick
 PackageUrl: https://pick-cli.pages.dev
 License: MIT
 LicenseUrl: https://github.com/aryanbhosale/pick/blob/main/LICENSE
-ShortDescription: Extract values from anything
-Description: Extract values from anything — JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV, and more.
+ShortDescription: Extract, filter, and transform values from any format
+Description: Extract values from anything — JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV, and more. Features pipes, select() filters with regex, array slicing, recursive descent, set/del mutations, output format conversion, and JSONL streaming.
 Tags:
   - cli
   - json
@@ -17,6 +17,10 @@ Tags:
   - toml
   - parser
   - extract
+  - jq
+  - filter
+  - pipe
+  - stream
 Installers:
   - Architecture: x64
     InstallerUrl: https://github.com/aryanbhosale/pick/releases/download/v$VERSION$/pick-v$VERSION$-x86_64-pc-windows-gnu.zip

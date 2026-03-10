@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>pick — Extract values from anything</title>
-  <meta name="description" content="A universal CLI tool to extract values from JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV, and more.">
-  <meta property="og:title" content="pick — Extract values from anything">
-  <meta property="og:description" content="One tool to replace jq, yq, grep, awk, and cut. Auto-detects format, simple selector syntax.">
+  <title>pick — Extract, filter, and transform values from anything</title>
+  <meta name="description" content="A universal CLI tool to extract, filter, and transform values from JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV, and more. Pipes, filters, mutations, output conversion, and JSONL streaming.">
+  <meta property="og:title" content="pick — Extract, filter, and transform values from anything">
+  <meta property="og:description" content="One tool to replace jq, yq, grep, awk, and cut. Auto-detects format, pipes, filters, mutations, output conversion, and streaming.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://pick-cli.pages.dev">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%E2%9E%9C</text></svg>">
@@ -96,7 +96,7 @@
     .hero p {
       color: var(--muted);
       font-size: 18px;
-      max-width: 500px;
+      max-width: 540px;
       margin: 0 auto 32px;
     }
 
@@ -229,6 +229,12 @@
       letter-spacing: -0.5px;
       margin-bottom: 32px;
     }
+    section h3.section-sub {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      margin-top: 32px;
+    }
 
     /* Format grid */
     .formats {
@@ -265,10 +271,31 @@
     .selector-table td:first-child {
       font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
       color: var(--accent);
-      width: 220px;
+      width: 280px;
       font-size: 14px;
     }
     .selector-table td:last-child {
+      color: var(--muted);
+    }
+
+    /* Operator table */
+    .op-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    .op-table td {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .op-table td:first-child {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      color: var(--accent);
+      width: 200px;
+      font-size: 13px;
+    }
+    .op-table td:last-child {
       color: var(--muted);
     }
 
@@ -294,6 +321,23 @@
       font-size: 13px;
       margin-top: 4px;
     }
+
+    /* Example blocks */
+    .example-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 13px;
+      line-height: 1.8;
+      overflow-x: auto;
+      margin-top: 12px;
+      margin-bottom: 16px;
+    }
+    .example-block .prompt { color: var(--green); }
+    .example-block .comment { color: var(--muted); }
+    .example-block .output { color: #a1a1aa; }
 
     /* Install grid */
     .install-grid {
@@ -350,6 +394,8 @@
       .install code { font-size: 13px; padding: 10px 14px; }
       .terminal-body { font-size: 12px; padding: 16px; }
       .selector-table td:first-child { width: 160px; }
+      .op-table td:first-child { width: 140px; }
+      .example-block { font-size: 11px; padding: 12px 14px; }
     }
   </style>
 </head>
@@ -370,8 +416,8 @@
 <div class="container">
 
   <div class="hero">
-    <h1>Extract values from <span>anything</span></h1>
-    <p>One tool to replace jq, yq, grep, awk, and cut. Auto-detects format. Simple selectors.</p>
+    <h1>Extract, filter, and transform <span>anything</span></h1>
+    <p>One tool to replace jq, yq, grep, awk, and cut. Pipes, filters, mutations, output conversion, and JSONL streaming.</p>
     <div class="install">
       <code id="install-cmd">cargo install pick-cli</code>
       <button onclick="copy()" id="copy-btn" title="Copy to clipboard">Copy</button>
@@ -389,29 +435,36 @@
         <button class="copy-term" onclick="copyBlock(this)"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button>
       </div>
       <div class="terminal-body">
-<span class="line"><span class="comment"># JSON</span></span>
+<span class="line"><span class="comment"># Extract from JSON</span></span>
 <span class="line"><span class="prompt">$</span> <span class="cmd">curl -s api.github.com/users/octocat | pick login</span></span>
 <span class="line"><span class="output">octocat</span></span>
 
-<span class="line gap"><span class="comment"># .env</span></span>
-<span class="line"><span class="prompt">$</span> <span class="cmd">cat .env | pick DATABASE_URL</span></span>
-<span class="line"><span class="output">postgres://localhost:5432/mydb</span></span>
-
-<span class="line gap"><span class="comment"># YAML</span></span>
-<span class="line"><span class="prompt">$</span> <span class="cmd">cat config.yaml | pick server.port</span></span>
-<span class="line"><span class="output">8080</span></span>
-
-<span class="line gap"><span class="comment"># HTTP headers</span></span>
-<span class="line"><span class="prompt">$</span> <span class="cmd">curl -sI example.com | pick content-type</span></span>
-<span class="line"><span class="output">text/html; charset=UTF-8</span></span>
-
-<span class="line gap"><span class="comment"># CSV</span></span>
-<span class="line"><span class="prompt">$</span> <span class="cmd">cat users.csv | pick '[0].name'</span></span>
+<span class="line gap"><span class="comment"># Pipe through filters</span></span>
+<span class="line"><span class="prompt">$</span> <span class="cmd">cat data.json | pick 'users | select(age > 21) | name'</span></span>
 <span class="line"><span class="output">Alice</span></span>
+<span class="line"><span class="output">Charlie</span></span>
 
-<span class="line gap"><span class="comment"># logfmt</span></span>
-<span class="line"><span class="prompt">$</span> <span class="cmd">echo 'level=info status=200' | pick status</span></span>
-<span class="line"><span class="output">200</span></span>
+<span class="line gap"><span class="comment"># Array slicing</span></span>
+<span class="line"><span class="prompt">$</span> <span class="cmd">cat items.json | pick 'items[0:3] | name'</span></span>
+<span class="line"><span class="output">first</span></span>
+<span class="line"><span class="output">second</span></span>
+<span class="line"><span class="output">third</span></span>
+
+<span class="line gap"><span class="comment"># Mutate and convert output format</span></span>
+<span class="line"><span class="prompt">$</span> <span class="cmd">cat config.json | pick 'set(env, "prod")' -o yaml</span></span>
+<span class="line"><span class="output">env: prod</span></span>
+<span class="line"><span class="output">port: 8080</span></span>
+
+<span class="line gap"><span class="comment"># Stream JSONL logs</span></span>
+<span class="line"><span class="prompt">$</span> <span class="cmd">cat events.jsonl | pick --stream 'select(level == "error") | message'</span></span>
+<span class="line"><span class="output">connection timeout</span></span>
+<span class="line"><span class="output">disk full</span></span>
+
+<span class="line gap"><span class="comment"># Recursive descent</span></span>
+<span class="line"><span class="prompt">$</span> <span class="cmd">cat package.json | pick '..name'</span></span>
+<span class="line"><span class="output">my-app</span></span>
+<span class="line"><span class="output">lodash</span></span>
+<span class="line"><span class="output">express</span></span>
       </div>
     </div>
   </div>
@@ -461,10 +514,122 @@
       <tr><td>foo.bar</td><td>Nested key</td></tr>
       <tr><td>foo[0]</td><td>Array index</td></tr>
       <tr><td>foo[-1]</td><td>Last element</td></tr>
+      <tr><td>foo[1:3]</td><td>Array slice (elements 1, 2)</td></tr>
+      <tr><td>foo[:2]</td><td>First two elements</td></tr>
+      <tr><td>foo[-2:]</td><td>Last two elements</td></tr>
       <tr><td>foo[*].name</td><td>Pluck field from all elements</td></tr>
+      <tr><td>..key</td><td>Recursive descent &mdash; find key anywhere</td></tr>
+      <tr><td>name, age</td><td>Multiple selectors (union)</td></tr>
       <tr><td>[0]</td><td>Index into root array</td></tr>
       <tr><td>"dotted.key".sub</td><td>Quoted key for dots in names</td></tr>
     </table>
+  </section>
+
+  <section>
+    <h2>Pipes &amp; Filters</h2>
+    <p style="color:var(--muted);margin-bottom:24px;">Chain operations with the pipe operator. Filter arrays with <code style="color:var(--accent);font-family:'SF Mono','Fira Code','Consolas',monospace;font-size:14px;">select()</code> using comparison operators, regex, and boolean logic.</p>
+
+    <div class="example-block">
+<span class="comment"># Chain operations with pipes</span>
+<span class="prompt">$</span> echo '{"users":[{"name":"Alice","age":30},{"name":"Bob","age":17}]}' \
+  | pick 'users | select(age >= 18) | name'
+<span class="output">Alice</span>
+
+<span class="comment"># Regex matching</span>
+<span class="prompt">$</span> echo '{"items":[{"id":"abc-123"},{"id":"def-456"},{"id":"abc-789"}]}' \
+  | pick 'items | select(id ~ "^abc") | id'
+<span class="output">abc-123</span>
+<span class="output">abc-789</span>
+
+<span class="comment"># Boolean logic</span>
+<span class="prompt">$</span> echo '{"users":[{"name":"Alice","active":true,"role":"admin"}]}' \
+  | pick 'users | select(active == true and role == "admin") | name'
+<span class="output">Alice</span>
+    </div>
+
+    <h3 class="section-sub">Filter operators</h3>
+    <table class="op-table">
+      <tr><td>==, !=</td><td>Equality / inequality</td></tr>
+      <tr><td>&gt;, &lt;, &gt;=, &lt;=</td><td>Numeric comparisons</td></tr>
+      <tr><td>~</td><td>Regex match</td></tr>
+      <tr><td>and, or, not</td><td>Boolean combinators</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Builtins</h2>
+    <p style="color:var(--muted);margin-bottom:24px;">Built-in functions for introspection and aggregation, usable anywhere in a pipeline.</p>
+
+    <table class="op-table">
+      <tr><td>keys()</td><td>Object keys as array</td></tr>
+      <tr><td>values()</td><td>Object values as array</td></tr>
+      <tr><td>length()</td><td>Length of array, object, or string</td></tr>
+    </table>
+
+    <div class="example-block" style="margin-top:16px;">
+<span class="prompt">$</span> echo '{"a":1,"b":2,"c":3}' | pick 'keys()'
+<span class="output">a</span>
+<span class="output">b</span>
+<span class="output">c</span>
+
+<span class="prompt">$</span> echo '{"a":1,"b":2,"c":3}' | pick 'keys() | length()'
+<span class="output">3</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>Mutation</h2>
+    <p style="color:var(--muted);margin-bottom:24px;">Immutable tree operations &mdash; <code style="color:var(--accent);font-family:'SF Mono','Fira Code','Consolas',monospace;font-size:14px;">set()</code> adds or replaces keys, <code style="color:var(--accent);font-family:'SF Mono','Fira Code','Consolas',monospace;font-size:14px;">del()</code> removes them. Both return the full modified document.</p>
+
+    <div class="example-block">
+<span class="comment"># Set a value</span>
+<span class="prompt">$</span> echo '{"name":"Alice"}' | pick 'set(role, "admin")' --json
+<span class="output">{"name":"Alice","role":"admin"}</span>
+
+<span class="comment"># Delete a key</span>
+<span class="prompt">$</span> echo '{"name":"Alice","tmp":true}' | pick 'del(tmp)' --json
+<span class="output">{"name":"Alice"}</span>
+
+<span class="comment"># Chain mutations in a pipeline</span>
+<span class="prompt">$</span> echo '{"a":1}' | pick 'set(b, 2) | del(a)' --json
+<span class="output">{"b":2}</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>Output formats</h2>
+    <p style="color:var(--muted);margin-bottom:24px;">Convert between formats on the fly with <code style="color:var(--accent);font-family:'SF Mono','Fira Code','Consolas',monospace;font-size:14px;">-o / --output</code>. Input format is auto-detected; output format is your choice.</p>
+
+    <div class="example-block">
+<span class="comment"># JSON to YAML</span>
+<span class="prompt">$</span> echo '{"name":"Alice","age":30}' | pick -o yaml
+<span class="output">age: 30</span>
+<span class="output">name: Alice</span>
+
+<span class="comment"># YAML to TOML</span>
+<span class="prompt">$</span> cat config.yaml | pick server -o toml
+<span class="output">host = "localhost"</span>
+<span class="output">port = 8080</span>
+
+<span class="comment"># Any format to JSON</span>
+<span class="prompt">$</span> cat .env | pick -o json
+<span class="output">{"DATABASE_URL":"postgres://...","PORT":"3000"}</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>JSONL streaming</h2>
+    <p style="color:var(--muted);margin-bottom:24px;">Process newline-delimited JSON line by line with <code style="color:var(--accent);font-family:'SF Mono','Fira Code','Consolas',monospace;font-size:14px;">--stream</code>. Each line is parsed and queried independently &mdash; perfect for log files and event streams.</p>
+
+    <div class="example-block">
+<span class="prompt">$</span> cat events.jsonl | pick --stream 'select(status >= 400) | url'
+<span class="output">/api/broken-endpoint</span>
+<span class="output">/api/timeout</span>
+
+<span class="prompt">$</span> cat metrics.jsonl | pick --stream 'select(cpu > 90) | host'
+<span class="output">server-3</span>
+<span class="output">server-7</span>
+    </div>
   </section>
 
   <section>
@@ -475,8 +640,16 @@
         <p>Force input format</p>
       </div>
       <div class="flag">
+        <code>-o, --output &lt;format&gt;</code>
+        <p>Output as json, yaml, or toml</p>
+      </div>
+      <div class="flag">
         <code>-f, --file &lt;path&gt;</code>
         <p>Read from file instead of stdin</p>
+      </div>
+      <div class="flag">
+        <code>--stream</code>
+        <p>JSONL line-by-line mode</p>
       </div>
       <div class="flag">
         <code>--json</code>
@@ -501,6 +674,14 @@
       <div class="flag">
         <code>-c, --count</code>
         <p>Count matches</p>
+      </div>
+      <div class="flag">
+        <code>-r, --raw</code>
+        <p>No quotes on strings</p>
+      </div>
+      <div class="flag">
+        <code>-q, --quiet</code>
+        <p>Suppress errors</p>
       </div>
     </div>
   </section>

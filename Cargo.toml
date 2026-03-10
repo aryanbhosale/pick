@@ -2,12 +2,12 @@
 name = "pick-cli"
 version = "0.1.2"
 edition = "2024"
-description = "Extract values from anything — JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV, and more"
+description = "Extract, filter, and transform values from JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV, and more"
 license = "MIT"
 repository = "https://github.com/aryanbhosale/pick"
 homepage = "https://pick-cli.pages.dev"
 readme = "README.md"
-keywords = ["cli", "json", "yaml", "extract", "parser"]
+keywords = ["cli", "json", "yaml", "extract", "jq"]
 categories = ["command-line-utilities", "parsing"]
 exclude = [
     "npm/",
@@ -36,6 +36,7 @@ serde_yaml = "0.9"
 toml = "0.8"
 csv = "1"
 thiserror = "2"
+regex = "1"
 
 [dev-dependencies]
 assert_cmd = "2"

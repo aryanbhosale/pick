@@ -1,5 +1,5 @@
 class Pick < Formula
-  desc "Extract values from anything — JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV, and more"
+  desc "Extract, filter, and transform values from JSON, YAML, TOML, .env, headers, logfmt, CSV, and more"
   homepage "https://pick-cli.pages.dev"
   license "MIT"
   version "$VERSION$"

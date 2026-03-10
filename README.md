@@ -13,9 +13,9 @@ Extract values from anything &mdash; JSON, YAML, TOML, .env, HTTP headers, logfm
 cargo install pick-cli
 ```
 
-`pick` auto-detects the input format and lets you extract values using a simple selector syntax. No more juggling `jq`, `yq`, `grep`, `awk`, and `cut` for different formats.
+`pick` auto-detects the input format and lets you extract, filter, and transform values using a unified selector syntax. Think of it as **jq for all config formats** &mdash; no more juggling `jq`, `yq`, `grep`, `awk`, and `cut`.
 
-## Usage
+## Quick Start
 
 ```bash
 # JSON
@@ -56,14 +56,114 @@ cat data.csv | pick '[0].name'
 | `foo[0]` | Array index |
 | `foo[-1]` | Last element |
 | `foo[*].name` | All elements, pluck field |
+| `foo[1:3]` | Array slice (elements 1 and 2) |
+| `foo[:2]` | First 2 elements |
+| `foo[-2:]` | Last 2 elements |
 | `[0]` | Index into root array |
+| `..name` | Recursive descent &mdash; find `name` at any depth |
 | `"dotted.key".sub` | Quoted key (for keys containing dots) |
+| `name, age` | Multiple selectors (union) |
+
+## Pipes & Filters
+
+Chain operations with the pipe operator (`|`), filter with `select()`, and transform with builtins:
+
+```bash
+# Filter: find expensive items
+cat data.json | pick 'items[*] | select(.price > 100) | name'
+
+# Regex: match patterns
+cat data.json | pick 'items[*] | select(.email ~ "@gmail\\.com$") | name'
+
+# Boolean logic: and, or, not
+cat data.json | pick 'users[*] | select(.age >= 18 and .active == true) | name'
+
+# Builtins: keys, values, length
+cat config.json | pick 'keys()'
+cat config.json | pick 'dependencies | length()'
+cat data.json | pick 'items[*].name | length()'
+
+# Chain multiple stages
+cat data.json | pick 'items[*] | select(.price > 50) | name | length()'
+```
+
+### Filter Operators
+
+| Operator | Example | Description |
+|---|---|---|
+| `==` | `select(.role == "admin")` | Equality |
+| `!=` | `select(.status != "deleted")` | Inequality |
+| `>` | `select(.price > 100)` | Greater than |
+| `<` | `select(.age < 18)` | Less than |
+| `>=` | `select(.score >= 90)` | Greater or equal |
+| `<=` | `select(.count <= 10)` | Less or equal |
+| `~` | `select(.name ~ "^A")` | Regex match |
+| `and` | `select(.a > 1 and .b < 5)` | Logical AND |
+| `or` | `select(.x == 1 or .y == 2)` | Logical OR |
+| `not` | `select(not .deleted)` | Logical NOT |
+
+### Builtins
+
+| Builtin | Description |
+|---|---|
+| `keys()` | Get object keys or array indices |
+| `values()` | Get object values |
+| `length()` | Length of array, object, or string |
+
+## Mutation
+
+Modify data in-place with `set()` and `del()`:
+
+```bash
+# Set a value
+cat config.json | pick 'set(.version, "2.0")' --json
+
+# Delete a key
+cat config.json | pick 'del(.temp)' --json
+
+# Chain mutations
+cat data.json | pick 'set(.status, "active") | del(.temp)' --json
+
+# Mutate then extract
+cat config.json | pick 'set(.version, "2.0") | version'
+```
+
+## Output Formats
+
+Convert between formats with `--output`:
+
+```bash
+# JSON to YAML
+cat data.json | pick -o yaml
+
+# JSON to TOML
+cat data.json | pick 'config' -o toml
+
+# Always output JSON
+cat data.json | pick 'name' --json
+```
+
+## Streaming (JSONL)
+
+Process newline-delimited JSON (JSONL) line-by-line with `--stream`:
+
+```bash
+# Extract from each line
+cat events.jsonl | pick 'user.name' --stream
+
+# Filter streamed data
+cat logs.jsonl | pick 'select(.level == "error") | message' --stream
+
+# Stream from file
+pick -f events.jsonl 'timestamp' --stream
+```
 
 ## Flags
 
 | Flag | Description |
 |---|---|
 | `-i, --input <format>` | Force input format (`json`, `yaml`, `toml`, `env`, `headers`, `logfmt`, `csv`, `text`) |
+| `-o, --output <format>` | Output format (`json`, `yaml`, `toml`) |
 | `-f, --file <path>` | Read from file instead of stdin |
 | `--json` | Output result as JSON |
 | `--raw` | Output without trailing newline |
@@ -73,6 +173,7 @@ cat data.csv | pick '[0].name'
 | `-q, --quiet` | Suppress error messages |
 | `-e, --exists` | Check if selector matches (exit code only) |
 | `-c, --count` | Output count of matches |
+| `--stream` | Stream mode: process JSONL input line-by-line |
 
 ## Examples
 
@@ -95,16 +196,6 @@ echo '[1,2,3,4,5]' | pick '[*]' --count
 # 5
 ```
 
-### Format override
-
-```bash
-# Force YAML parsing on ambiguous input
-cat data.txt | pick -i yaml server.host
-
-# Parse a file directly
-pick -f config.toml database.url
-```
-
 ### Real-world
 
 ```bash
@@ -114,8 +205,21 @@ docker inspect mycontainer | pick '[0].State.Status'
 # Kubernetes pod IPs
 kubectl get pods -o yaml | pick 'items[*].status.podIP' --lines
 
+# Find all IDs recursively in any JSON
+cat response.json | pick '..id'
+
 # Cargo.toml dependencies
 pick -f Cargo.toml dependencies.serde.version
+
+# GitHub API: filter Rust repos with 100+ stars
+curl -s https://api.github.com/users/octocat/repos | \
+  pick '[*] | select(.language == "Rust" and .stargazers_count > 100) | name'
+
+# Terraform outputs
+terraform output -json | pick '..value'
+
+# npm: count dependencies
+cat package.json | pick 'dependencies | keys() | length()'
 
 # .env database URL for a script
 export DB=$(cat .env | pick DATABASE_URL)
@@ -208,7 +312,7 @@ Contributions are welcome! Here's how to get started:
 ### Development
 
 ```bash
-# Run all tests (259 unit + integration)
+# Run all tests (866 tests)
 cargo test
 
 # Run a specific test
@@ -224,13 +328,19 @@ cargo build --release
 
 ```
 src/
-  main.rs          Entry point, stdin/file reading
+  main.rs          Entry point, stdin/file reading, streaming
   lib.rs           Orchestration and format routing
   cli.rs           CLI argument definitions
   error.rs         Error types
-  selector.rs      Selector parser and extraction engine
+  selector/        Selector engine (modular)
+    types.rs       AST types (Expression, Pipeline, Selector, Filter, etc.)
+    parser.rs      Hand-rolled recursive descent parser
+    extract.rs     Path traversal and pipeline execution
+    filter.rs      Filter evaluation (select, comparisons, regex)
+    manipulate.rs  set() and del() operations
   detector.rs      Format auto-detection heuristics
-  output.rs        Output formatting
+  output.rs        Output formatting (plain, JSON, YAML, TOML)
+  streaming.rs     JSONL streaming processor
   formats/         Per-format parsers
     json.rs, yaml.rs, toml_format.rs, env.rs,
     headers.rs, logfmt.rs, csv_format.rs, text.rs

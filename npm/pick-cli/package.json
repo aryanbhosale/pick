@@ -1,7 +1,7 @@
 {
   "name": "@aryanbhosale/pick",
   "version": "0.1.0",
-  "description": "Extract values from anything — JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV, and more",
+  "description": "Extract, filter, and transform values from JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV, and more",
   "license": "MIT",
   "funding": {
     "type": "github",

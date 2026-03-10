@@ -350,6 +350,7 @@ dependencies = [
  "clap",
  "csv",
  "predicates",
+ "regex",
  "serde",
  "serde_json",
  "serde_yaml",

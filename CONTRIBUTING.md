@@ -39,18 +39,35 @@ Thanks for your interest in contributing! Here's everything you need to get star
 
 ## Architecture overview
 
-All input formats are parsed into `serde_json::Value` as a unified data model. The selector engine then traverses this value tree.
+All input formats are parsed into `serde_json::Value` as a unified data model. The selector engine then traverses this value tree through a pipeline of stages.
 
 ```
-stdin/file → detect format → parse → serde_json::Value → selector → output
+stdin/file → detect format → parse → serde_json::Value → pipeline execution → output
 ```
 
-Key files:
-- `src/selector.rs` — Selector parser and extraction logic
-- `src/detector.rs` — Format auto-detection heuristics
-- `src/formats/` — One file per format parser
-- `src/output.rs` — Output formatting (plain, JSON, lines)
-- `tests/integration.rs` — CLI integration tests
+### Pipeline execution model
+
+```
+Expression = Pipeline, Pipeline, ...     (comma-separated = union)
+Pipeline   = Stage | Stage | ...         (pipe-separated = sequential)
+Stage      = Path | Builtin | Select | Set | Del
+```
+
+### Key files
+
+```
+src/selector/
+  types.rs       — AST types (Expression, Pipeline, PipeStage, Selector, FilterExpr, etc.)
+  parser.rs      — Hand-rolled recursive descent parser for the expression language
+  extract.rs     — Path traversal and pipeline execution engine
+  filter.rs      — Filter evaluation for select() (comparisons, regex, truthiness)
+  manipulate.rs  — Immutable tree manipulation for set() and del()
+src/
+  detector.rs    — Format auto-detection heuristics
+  formats/       — One file per format parser
+  output.rs      — Output formatting (plain, JSON, YAML, TOML)
+  streaming.rs   — JSONL streaming processor
+```
 
 ## Adding a new format
 
@@ -60,6 +77,20 @@ Key files:
 4. Add detection logic in `src/detector.rs`
 5. Wire it up in `src/lib.rs`
 6. Add unit tests in the format file and integration tests in `tests/integration.rs`
+
+## Adding a new builtin
+
+1. Add the variant to the `Builtin` enum in `src/selector/types.rs`
+2. Add parsing logic in `src/selector/parser.rs` (in `parse_segment`)
+3. Implement the logic in `apply_builtin()` in `src/selector/extract.rs`
+4. Add parser tests, extraction tests, and integration tests
+
+## Adding a new pipe stage
+
+1. Add the variant to `PipeStage` in `src/selector/types.rs`
+2. Add parsing in `parse_pipe_stage()` in `src/selector/parser.rs`
+3. Handle execution in `execute_stage()` in `src/selector/extract.rs`
+4. Add tests at every level
 
 ## Code style
 

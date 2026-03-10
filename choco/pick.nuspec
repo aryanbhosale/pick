@@ -11,8 +11,8 @@
     <bugTrackerUrl>https://github.com/aryanbhosale/pick/issues</bugTrackerUrl>
     <licenseUrl>https://github.com/aryanbhosale/pick/blob/main/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <summary>Extract values from anything</summary>
-    <description>Extract values from anything — JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV, and more. Auto-detects the input format and lets you extract values using a simple selector syntax.</description>
-    <tags>cli json yaml toml env logfmt csv parser extract jq</tags>
+    <summary>Extract, filter, and transform values from any format</summary>
+    <description>Extract values from anything — JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV, and more. Auto-detects the input format and lets you extract, filter, and transform values using a unified selector syntax. Features pipes, select() filters with regex, array slicing, recursive descent, set/del mutations, output format conversion, and JSONL streaming.</description>
+    <tags>cli json yaml toml env logfmt csv parser extract jq filter pipe stream</tags>
   </metadata>
 </package>

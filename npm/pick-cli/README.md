@@ -11,7 +11,7 @@ Extract values from anything — JSON, YAML, TOML, .env, HTTP headers, logfmt, C
 npm install -g @aryanbhosale/pick
 ```
 
-`pick` auto-detects the input format and lets you extract values using a simple selector syntax. No more juggling `jq`, `yq`, `grep`, `awk`, and `cut` for different formats.
+`pick` auto-detects the input format and lets you extract, filter, and transform values using a unified selector syntax. Think of it as **jq for all config formats**.
 
 ## Usage
 
@@ -54,14 +54,59 @@ cat data.csv | pick '[0].name'
 | `foo[0]` | Array index |
 | `foo[-1]` | Last element |
 | `foo[*].name` | All elements, pluck field |
+| `foo[1:3]` | Array slice (elements 1 and 2) |
+| `..name` | Recursive descent — find `name` at any depth |
 | `[0]` | Index into root array |
 | `"dotted.key".sub` | Quoted key (for keys containing dots) |
+| `name, age` | Multiple selectors (union) |
+
+## Pipes & Filters
+
+```bash
+# Filter: find expensive items
+cat data.json | pick 'items[*] | select(.price > 100) | name'
+
+# Regex match
+cat data.json | pick 'items[*] | select(.email ~ "@gmail") | name'
+
+# Boolean logic
+cat data.json | pick 'users[*] | select(.age >= 18 and .active) | name'
+
+# Builtins
+cat config.json | pick 'keys()'
+cat config.json | pick 'dependencies | length()'
+```
+
+## Mutation
+
+```bash
+# Set a value
+cat config.json | pick 'set(.version, "2.0")' --json
+
+# Delete a key
+cat config.json | pick 'del(.temp)' --json
+```
+
+## Output Formats
+
+```bash
+cat data.json | pick -o yaml    # Convert to YAML
+cat data.json | pick -o toml    # Convert to TOML
+```
+
+## Streaming (JSONL)
+
+```bash
+cat events.jsonl | pick 'user.name' --stream
+cat logs.jsonl | pick 'select(.level == "error") | message' --stream
+```
 
 ## Flags
 
 | Flag | Description |
 |---|---|
 | `-i, --input <format>` | Force input format (`json`, `yaml`, `toml`, `env`, `headers`, `logfmt`, `csv`, `text`) |
+| `-o, --output <format>` | Output format (`json`, `yaml`, `toml`) |
 | `-f, --file <path>` | Read from file instead of stdin |
 | `--json` | Output result as JSON |
 | `--raw` | Output without trailing newline |
@@ -71,29 +116,11 @@ cat data.csv | pick '[0].name'
 | `-q, --quiet` | Suppress error messages |
 | `-e, --exists` | Check if selector matches (exit code only) |
 | `-c, --count` | Count matches |
+| `--stream` | Stream mode: process JSONL line-by-line |
 
 ## Supported Formats
 
 JSON, YAML, TOML, .env, HTTP headers, logfmt, CSV/TSV, and plain text. Format is auto-detected — use `-i` to override.
-
-## Pipe-friendly
-
-```bash
-# Get all repo names
-curl -s https://api.github.com/users/octocat/repos | pick '[*].name' --lines
-
-# Check if key exists
-if cat config.json | pick database.host --exists; then
-  DB_HOST=$(cat config.json | pick database.host)
-fi
-
-# Extract with fallback
-cat config.yaml | pick server.port --default 3000
-
-# Count results
-echo '[1,2,3,4,5]' | pick '[*]' --count
-# 5
-```
 
 ## Links
 
