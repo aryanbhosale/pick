@@ -1,13 +1,17 @@
+use super::types::Segment;
 use crate::error::PickError;
 use serde_json::Value;
-use super::types::Segment;
 
 /// Set a value at the given path, returning a new Value with the modification.
 /// Creates intermediate objects/arrays as needed.
 ///
 /// Time: O(d * w) where d = path depth, w = width at each level (clone cost).
 /// Space: O(N) for the cloned tree.
-pub fn apply_set(value: &Value, segments: &[Segment], new_value: &Value) -> Result<Value, PickError> {
+pub fn apply_set(
+    value: &Value,
+    segments: &[Segment],
+    new_value: &Value,
+) -> Result<Value, PickError> {
     if segments.is_empty() {
         return Ok(new_value.clone());
     }
@@ -28,7 +32,8 @@ pub fn apply_set(value: &Value, segments: &[Segment], new_value: &Value) -> Resu
             // If value is not an object, create one
             _ => {
                 let mut new_map = serde_json::Map::new();
-                let child = apply_set_with_indices(&Value::Null, &segment.indices, rest, new_value)?;
+                let child =
+                    apply_set_with_indices(&Value::Null, &segment.indices, rest, new_value)?;
                 new_map.insert(key.clone(), child);
                 Ok(Value::Object(new_map))
             }
@@ -53,23 +58,22 @@ fn apply_set_with_indices(
     let rest_indices = &indices[1..];
 
     match index {
-        super::types::Index::Number(n) => {
-            match value {
-                Value::Array(arr) => {
-                    let len = arr.len();
-                    let i = resolve_index(*n, len)?;
-                    let mut new_arr = arr.clone();
-                    if i < len {
-                        let child = &arr[i];
-                        new_arr[i] = apply_set_with_indices(child, rest_indices, remaining_segments, new_value)?;
-                    }
-                    Ok(Value::Array(new_arr))
+        super::types::Index::Number(n) => match value {
+            Value::Array(arr) => {
+                let len = arr.len();
+                let i = resolve_index(*n, len)?;
+                let mut new_arr = arr.clone();
+                if i < len {
+                    let child = &arr[i];
+                    new_arr[i] =
+                        apply_set_with_indices(child, rest_indices, remaining_segments, new_value)?;
                 }
-                _ => Err(PickError::NotAnArray(
-                    super::extract::value_type_name(value).into(),
-                )),
+                Ok(Value::Array(new_arr))
             }
-        }
+            _ => Err(PickError::NotAnArray(
+                super::extract::value_type_name(value).into(),
+            )),
+        },
         // Wildcard and Slice set operations are not supported
         _ => Err(PickError::InvalidSelector(
             "set() does not support wildcard or slice indices".into(),
@@ -147,7 +151,8 @@ fn apply_del_with_indices(
                     } else {
                         // Intermediate index: recurse
                         let mut new_arr = arr.clone();
-                        new_arr[i] = apply_del_with_indices(&arr[i], rest_indices, remaining_segments)?;
+                        new_arr[i] =
+                            apply_del_with_indices(&arr[i], rest_indices, remaining_segments)?;
                         Ok(Value::Array(new_arr))
                     }
                 }
@@ -452,7 +457,12 @@ mod tests {
     fn set_object_value() {
         let val = json!({"config": {}});
         let sel = Selector::parse("config.server").unwrap();
-        let result = apply_set(&val, &sel.segments, &json!({"host": "localhost", "port": 8080})).unwrap();
+        let result = apply_set(
+            &val,
+            &sel.segments,
+            &json!({"host": "localhost", "port": 8080}),
+        )
+        .unwrap();
         assert_eq!(result["config"]["server"]["host"], json!("localhost"));
     }
 

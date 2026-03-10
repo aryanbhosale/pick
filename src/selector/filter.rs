@@ -1,8 +1,8 @@
+use super::extract::extract;
+use super::types::*;
 use crate::error::PickError;
 use regex::Regex;
 use serde_json::Value;
-use super::extract::extract;
-use super::types::*;
 
 /// Evaluate a filter expression against a JSON value.
 /// Returns `true` if the value passes the filter.
@@ -13,12 +13,8 @@ pub fn evaluate(value: &Value, expr: &FilterExpr) -> Result<bool, PickError> {
             let results = extract(value, path)?;
             Ok(results.first().is_some_and(is_truthy))
         }
-        FilterExpr::And(left, right) => {
-            Ok(evaluate(value, left)? && evaluate(value, right)?)
-        }
-        FilterExpr::Or(left, right) => {
-            Ok(evaluate(value, left)? || evaluate(value, right)?)
-        }
+        FilterExpr::And(left, right) => Ok(evaluate(value, left)? && evaluate(value, right)?),
+        FilterExpr::Or(left, right) => Ok(evaluate(value, left)? || evaluate(value, right)?),
         FilterExpr::Not(inner) => Ok(!evaluate(value, inner)?),
     }
 }
@@ -58,9 +54,7 @@ fn value_eq(lhs: &Value, rhs: &LiteralValue) -> bool {
 /// Ordering: only meaningful for same-type numeric or string comparisons.
 fn value_cmp(lhs: &Value, rhs: &LiteralValue) -> Option<std::cmp::Ordering> {
     match (lhs, rhs) {
-        (Value::Number(a), LiteralValue::Number(b)) => {
-            a.as_f64().and_then(|af| af.partial_cmp(b))
-        }
+        (Value::Number(a), LiteralValue::Number(b)) => a.as_f64().and_then(|af| af.partial_cmp(b)),
         (Value::String(a), LiteralValue::String(b)) => Some(a.as_str().cmp(b.as_str())),
         _ => None,
     }
@@ -91,12 +85,18 @@ mod tests {
 
     #[test]
     fn eq_strings() {
-        assert!(value_eq(&json!("hello"), &LiteralValue::String("hello".into())));
+        assert!(value_eq(
+            &json!("hello"),
+            &LiteralValue::String("hello".into())
+        ));
     }
 
     #[test]
     fn eq_strings_differ() {
-        assert!(!value_eq(&json!("hello"), &LiteralValue::String("world".into())));
+        assert!(!value_eq(
+            &json!("hello"),
+            &LiteralValue::String("world".into())
+        ));
     }
 
     #[test]
@@ -649,9 +649,9 @@ mod tests {
     fn evaluate_not_of_not() {
         // not(not true) = true
         let val = json!({"active": true});
-        let expr = FilterExpr::Not(Box::new(FilterExpr::Not(Box::new(
-            FilterExpr::Truthy(Selector::parse("active").unwrap()),
-        ))));
+        let expr = FilterExpr::Not(Box::new(FilterExpr::Not(Box::new(FilterExpr::Truthy(
+            Selector::parse("active").unwrap(),
+        )))));
         assert!(evaluate(&val, &expr).unwrap());
     }
 

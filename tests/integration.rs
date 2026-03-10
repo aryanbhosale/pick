@@ -879,7 +879,9 @@ fn select_gt() {
 fn select_eq_string() {
     pick()
         .arg("users[*] | select(.role == \"admin\") | name")
-        .write_stdin(r#"{"users": [{"name": "Alice", "role": "admin"}, {"name": "Bob", "role": "user"}]}"#)
+        .write_stdin(
+            r#"{"users": [{"name": "Alice", "role": "admin"}, {"name": "Bob", "role": "user"}]}"#,
+        )
         .assert()
         .success()
         .stdout("Alice\n");
@@ -899,7 +901,9 @@ fn select_and() {
 fn select_truthy() {
     pick()
         .arg("items[*] | select(.active) | name")
-        .write_stdin(r#"{"items": [{"name": "a", "active": true}, {"name": "b", "active": false}]}"#)
+        .write_stdin(
+            r#"{"items": [{"name": "a", "active": true}, {"name": "b", "active": false}]}"#,
+        )
         .assert()
         .success()
         .stdout("a\n");
@@ -1020,7 +1024,9 @@ fn stream_jsonl() {
 fn stream_with_select() {
     pick()
         .args(["items[*] | select(.price > 10) | name", "--stream"])
-        .write_stdin("{\"items\": [{\"name\": \"a\", \"price\": 5}, {\"name\": \"b\", \"price\": 20}]}\n")
+        .write_stdin(
+            "{\"items\": [{\"name\": \"a\", \"price\": 5}, {\"name\": \"b\", \"price\": 20}]}\n",
+        )
         .assert()
         .success()
         .stdout("b\n");
@@ -1336,7 +1342,9 @@ fn multi_selector_with_builtin() {
 fn pipe_three_stages() {
     pick()
         .arg("items[*] | select(.active) | name")
-        .write_stdin(r#"{"items": [{"name": "a", "active": true}, {"name": "b", "active": false}]}"#)
+        .write_stdin(
+            r#"{"items": [{"name": "a", "active": true}, {"name": "b", "active": false}]}"#,
+        )
         .assert()
         .success()
         .stdout("a\n");
@@ -2031,7 +2039,8 @@ fn terraform_output_style() {
 
 #[test]
 fn npm_list_style() {
-    let input = r#"{"dependencies": {"lodash": {"version": "4.17.21"}, "express": {"version": "4.18.2"}}}"#;
+    let input =
+        r#"{"dependencies": {"lodash": {"version": "4.17.21"}, "express": {"version": "4.18.2"}}}"#;
     pick()
         .arg("dependencies..version")
         .write_stdin(input)

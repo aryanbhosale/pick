@@ -216,24 +216,19 @@ mod tests {
 
     #[test]
     fn format_lines_array() {
-        let output =
-            format_output(&[json!(["a", "b", "c"])], false, true, &OutputFormat::Auto);
+        let output = format_output(&[json!(["a", "b", "c"])], false, true, &OutputFormat::Auto);
         assert_eq!(output, "a\nb\nc");
     }
 
     #[test]
     fn format_lines_multiple() {
-        let output =
-            format_output(&[json!("x"), json!("y")], false, true, &OutputFormat::Auto);
+        let output = format_output(&[json!("x"), json!("y")], false, true, &OutputFormat::Auto);
         assert_eq!(output, "x\ny");
     }
 
     #[test]
     fn format_empty() {
-        assert_eq!(
-            format_output(&[], false, false, &OutputFormat::Auto),
-            ""
-        );
+        assert_eq!(format_output(&[], false, false, &OutputFormat::Auto), "");
     }
 
     #[test]
@@ -256,24 +251,36 @@ mod tests {
 
     #[test]
     fn format_output_yaml() {
-        let output =
-            format_output(&[json!({"name": "Alice"})], false, false, &OutputFormat::Yaml);
+        let output = format_output(
+            &[json!({"name": "Alice"})],
+            false,
+            false,
+            &OutputFormat::Yaml,
+        );
         assert!(output.contains("name:"));
         assert!(output.contains("Alice"));
     }
 
     #[test]
     fn format_output_toml() {
-        let output =
-            format_output(&[json!({"name": "Alice"})], false, false, &OutputFormat::Toml);
+        let output = format_output(
+            &[json!({"name": "Alice"})],
+            false,
+            false,
+            &OutputFormat::Toml,
+        );
         assert!(output.contains("name"));
         assert!(output.contains("Alice"));
     }
 
     #[test]
     fn format_output_json_explicit() {
-        let output =
-            format_output(&[json!({"name": "Alice"})], false, false, &OutputFormat::Json);
+        let output = format_output(
+            &[json!({"name": "Alice"})],
+            false,
+            false,
+            &OutputFormat::Json,
+        );
         assert!(output.contains("\"name\""));
         assert!(output.contains("\"Alice\""));
     }
@@ -286,8 +293,7 @@ mod tests {
 
     #[test]
     fn format_yaml_array() {
-        let output =
-            format_output(&[json!([1, 2, 3])], false, false, &OutputFormat::Yaml);
+        let output = format_output(&[json!([1, 2, 3])], false, false, &OutputFormat::Yaml);
         assert!(output.contains("- 1"));
     }
 
@@ -404,24 +410,14 @@ mod tests {
     #[test]
     fn format_toml_array_fallback() {
         // TOML can't represent array root; wraps in "results"
-        let output = format_output(
-            &[json!([1, 2, 3])],
-            false,
-            false,
-            &OutputFormat::Toml,
-        );
+        let output = format_output(&[json!([1, 2, 3])], false, false, &OutputFormat::Toml);
         // Falls back to plain since array is not a table
         assert!(output.contains("1"));
     }
 
     #[test]
     fn format_toml_boolean() {
-        let output = format_output(
-            &[json!({"flag": true})],
-            false,
-            false,
-            &OutputFormat::Toml,
-        );
+        let output = format_output(&[json!({"flag": true})], false, false, &OutputFormat::Toml);
         assert!(output.contains("flag = true"));
     }
 
@@ -438,12 +434,7 @@ mod tests {
 
     #[test]
     fn format_toml_integer() {
-        let output = format_output(
-            &[json!({"count": 42})],
-            false,
-            false,
-            &OutputFormat::Toml,
-        );
+        let output = format_output(&[json!({"count": 42})], false, false, &OutputFormat::Toml);
         assert!(output.contains("count = 42"));
     }
 

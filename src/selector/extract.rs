@@ -1,6 +1,6 @@
+use super::types::*;
 use crate::error::PickError;
 use serde_json::Value;
-use super::types::*;
 
 const MAX_EXTRACT_RESULTS: usize = 1_000_000;
 
@@ -70,7 +70,11 @@ fn execute_stage(inputs: &[Value], stage: &PipeStage) -> Result<Vec<Value>, Pick
             let json_value = value.to_json_value();
             let mut results = Vec::new();
             for input in inputs {
-                results.push(super::manipulate::apply_set(input, &path.segments, &json_value)?);
+                results.push(super::manipulate::apply_set(
+                    input,
+                    &path.segments,
+                    &json_value,
+                )?);
             }
             Ok(results)
         }
@@ -152,9 +156,10 @@ fn resolve_key_direct(value: &Value, segment: &Segment) -> Result<Vec<Value>, Pi
 }
 
 fn resolve_key_recursive(value: &Value, segment: &Segment) -> Result<Vec<Value>, PickError> {
-    let key = segment.key.as_ref().ok_or_else(|| {
-        PickError::InvalidSelector("recursive descent requires a key".into())
-    })?;
+    let key = segment
+        .key
+        .as_ref()
+        .ok_or_else(|| PickError::InvalidSelector("recursive descent requires a key".into()))?;
 
     let found = recursive_find(value, key);
     if found.is_empty() {
@@ -300,10 +305,7 @@ fn apply_segment_builtin(
 ) -> Result<Vec<Value>, PickError> {
     match builtin {
         None => Ok(values),
-        Some(b) => values
-            .into_iter()
-            .map(|v| apply_builtin(b, &v))
-            .collect(),
+        Some(b) => values.into_iter().map(|v| apply_builtin(b, &v)).collect(),
     }
 }
 
@@ -945,8 +947,7 @@ mod tests {
             {"price": 150, "stock": 0},
             {"price": 200, "stock": 5}
         ]});
-        let expr =
-            Expression::parse("items[*] | select(.price > 100 and .stock > 0)").unwrap();
+        let expr = Expression::parse("items[*] | select(.price > 100 and .stock > 0)").unwrap();
         let result = execute(&val, &expr).unwrap();
         assert_eq!(result.len(), 1);
         assert_eq!(result[0]["price"], json!(200));
@@ -989,8 +990,7 @@ mod tests {
             {"status": "deleted"},
             {"status": "active"}
         ]});
-        let expr =
-            Expression::parse("items[*] | select(.status != \"deleted\")").unwrap();
+        let expr = Expression::parse("items[*] | select(.status != \"deleted\")").unwrap();
         let result = execute(&val, &expr).unwrap();
         assert_eq!(result.len(), 2);
     }
@@ -1001,8 +1001,7 @@ mod tests {
             {"name": "a", "email": null},
             {"name": "b", "email": "b@x.com"}
         ]});
-        let expr =
-            Expression::parse("items[*] | select(.email != null)").unwrap();
+        let expr = Expression::parse("items[*] | select(.email != null)").unwrap();
         let result = execute(&val, &expr).unwrap();
         assert_eq!(result.len(), 1);
         assert_eq!(result[0]["name"], json!("b"));
@@ -1196,7 +1195,10 @@ mod tests {
         let val = json!([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
         let sel = Selector::parse("[*][0:2]").unwrap();
         let result = extract(&val, &sel).unwrap();
-        assert_eq!(result, vec![json!(1), json!(2), json!(4), json!(5), json!(7), json!(8)]);
+        assert_eq!(
+            result,
+            vec![json!(1), json!(2), json!(4), json!(5), json!(7), json!(8)]
+        );
     }
 
     #[test]
@@ -1651,7 +1653,8 @@ mod tests {
             {"name": "b", "active": false},
             {"name": "c", "active": true}
         ]});
-        let expr = Expression::parse("items[0:2] | select(.active) | set(.selected, true)").unwrap();
+        let expr =
+            Expression::parse("items[0:2] | select(.active) | set(.selected, true)").unwrap();
         let result = execute(&val, &expr).unwrap();
         assert_eq!(result.len(), 1);
         assert_eq!(result[0]["name"], json!("a"));

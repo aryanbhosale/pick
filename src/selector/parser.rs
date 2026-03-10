@@ -1,5 +1,5 @@
-use crate::error::PickError;
 use super::types::*;
+use crate::error::PickError;
 
 // ──────────────────────────────────────────────
 // Expression / Pipeline / Stage parsing
@@ -40,9 +40,7 @@ impl Pipeline {
         for part in parts {
             let trimmed = part.trim();
             if trimmed.is_empty() {
-                return Err(PickError::InvalidSelector(
-                    "empty stage in pipeline".into(),
-                ));
+                return Err(PickError::InvalidSelector("empty stage in pipeline".into()));
             }
             stages.push(parse_pipe_stage(trimmed)?);
         }
@@ -159,20 +157,19 @@ fn parse_segment(input: &str) -> Result<(Segment, &str), PickError> {
     let (key, remaining) = parse_key(input)?;
 
     // Check for builtin syntax: keys(), values(), length()
-    if let Some(ref k) = key {
-        if let Some(builtin) = recognize_builtin(k) {
-            if remaining.starts_with("()") {
-                return Ok((
-                    Segment {
-                        key: None,
-                        indices: vec![],
-                        recursive: false,
-                        builtin: Some(builtin),
-                    },
-                    &remaining[2..],
-                ));
-            }
-        }
+    if let Some(ref k) = key
+        && let Some(builtin) = recognize_builtin(k)
+        && let Some(after_parens) = remaining.strip_prefix("()")
+    {
+        return Ok((
+            Segment {
+                key: None,
+                indices: vec![],
+                recursive: false,
+                builtin: Some(builtin),
+            },
+            after_parens,
+        ));
     }
 
     let (indices, remaining) = parse_indices(remaining)?;
@@ -210,9 +207,7 @@ fn parse_key(input: &str) -> Result<(Option<String>, &str), PickError> {
         loop {
             match chars.next() {
                 None => {
-                    return Err(PickError::InvalidSelector(
-                        "unterminated quoted key".into(),
-                    ));
+                    return Err(PickError::InvalidSelector("unterminated quoted key".into()));
                 }
                 Some('"') => {
                     consumed += 1;
@@ -279,9 +274,7 @@ fn parse_indices(input: &str) -> Result<(Vec<Index>, &str), PickError> {
         if content == "*" {
             indices.push(Index::Wildcard);
         } else if content.is_empty() {
-            return Err(PickError::InvalidSelector(
-                "empty index bracket".into(),
-            ));
+            return Err(PickError::InvalidSelector("empty index bracket".into()));
         } else if let Some(colon_pos) = content.find(':') {
             let start_str = content[..colon_pos].trim();
             let end_str = content[colon_pos + 1..].trim();
@@ -304,9 +297,9 @@ fn parse_indices(input: &str) -> Result<(Vec<Index>, &str), PickError> {
 
             indices.push(Index::Slice { start, end });
         } else {
-            let n: i64 = content.parse().map_err(|_| {
-                PickError::InvalidSelector(format!("invalid index: '{content}'"))
-            })?;
+            let n: i64 = content
+                .parse()
+                .map_err(|_| PickError::InvalidSelector(format!("invalid index: '{content}'")))?;
             indices.push(Index::Number(n));
         }
 
@@ -503,27 +496,26 @@ fn parse_literal(input: &str) -> Result<(LiteralValue, &str), PickError> {
     let input = input.trim_start();
 
     // null
-    if let Some(rest) = input.strip_prefix("null") {
-        if rest.is_empty() || !rest.as_bytes()[0].is_ascii_alphanumeric() {
-            return Ok((LiteralValue::Null, rest));
-        }
+    if let Some(rest) = input.strip_prefix("null")
+        && (rest.is_empty() || !rest.as_bytes()[0].is_ascii_alphanumeric())
+    {
+        return Ok((LiteralValue::Null, rest));
     }
 
     // booleans
-    if let Some(rest) = input.strip_prefix("true") {
-        if rest.is_empty() || !rest.as_bytes()[0].is_ascii_alphanumeric() {
-            return Ok((LiteralValue::Bool(true), rest));
-        }
+    if let Some(rest) = input.strip_prefix("true")
+        && (rest.is_empty() || !rest.as_bytes()[0].is_ascii_alphanumeric())
+    {
+        return Ok((LiteralValue::Bool(true), rest));
     }
-    if let Some(rest) = input.strip_prefix("false") {
-        if rest.is_empty() || !rest.as_bytes()[0].is_ascii_alphanumeric() {
-            return Ok((LiteralValue::Bool(false), rest));
-        }
+    if let Some(rest) = input.strip_prefix("false")
+        && (rest.is_empty() || !rest.as_bytes()[0].is_ascii_alphanumeric())
+    {
+        return Ok((LiteralValue::Bool(false), rest));
     }
 
     // quoted string
-    if input.starts_with('"') {
-        let rest = &input[1..];
+    if let Some(rest) = input.strip_prefix('"') {
         let mut value = String::new();
         let mut chars = rest.chars();
         let mut consumed = 0;
@@ -579,7 +571,9 @@ fn parse_literal(input: &str) -> Result<(LiteralValue, &str), PickError> {
 
     // number (integer or float, possibly negative)
     let num_end = input
-        .find(|c: char| !c.is_ascii_digit() && c != '.' && c != '-' && c != '+' && c != 'e' && c != 'E')
+        .find(|c: char| {
+            !c.is_ascii_digit() && c != '.' && c != '-' && c != '+' && c != 'e' && c != 'E'
+        })
         .unwrap_or(input.len());
 
     if num_end == 0 {
@@ -590,9 +584,9 @@ fn parse_literal(input: &str) -> Result<(LiteralValue, &str), PickError> {
     }
 
     let num_str = &input[..num_end];
-    let n: f64 = num_str.parse().map_err(|_| {
-        PickError::InvalidSelector(format!("invalid number: '{num_str}'"))
-    })?;
+    let n: f64 = num_str
+        .parse()
+        .map_err(|_| PickError::InvalidSelector(format!("invalid number: '{num_str}'")))?;
     Ok((LiteralValue::Number(n), &input[num_end..]))
 }
 
@@ -1484,7 +1478,10 @@ mod tests {
         assert_eq!(sel.segments[1].key, Some("items".into()));
         assert_eq!(
             sel.segments[1].indices,
-            vec![Index::Slice { start: Some(1), end: Some(3) }]
+            vec![Index::Slice {
+                start: Some(1),
+                end: Some(3)
+            }]
         );
     }
 
@@ -1495,7 +1492,10 @@ mod tests {
         assert_eq!(sel.segments[0].indices[0], Index::Wildcard);
         assert_eq!(
             sel.segments[0].indices[1],
-            Index::Slice { start: Some(0), end: Some(2) }
+            Index::Slice {
+                start: Some(0),
+                end: Some(2)
+            }
         );
     }
 
@@ -1505,7 +1505,10 @@ mod tests {
         assert_eq!(sel.segments[0].indices.len(), 2);
         assert_eq!(
             sel.segments[0].indices[0],
-            Index::Slice { start: Some(0), end: Some(3) }
+            Index::Slice {
+                start: Some(0),
+                end: Some(3)
+            }
         );
         assert_eq!(sel.segments[0].indices[1], Index::Wildcard);
     }
@@ -1524,7 +1527,10 @@ mod tests {
         let sel = Selector::parse("items[0:0]").unwrap();
         assert_eq!(
             sel.segments[0].indices,
-            vec![Index::Slice { start: Some(0), end: Some(0) }]
+            vec![Index::Slice {
+                start: Some(0),
+                end: Some(0)
+            }]
         );
     }
 
@@ -1553,7 +1559,10 @@ mod tests {
         assert_eq!(sel.segments[0].key, Some("items".into()));
         assert_eq!(
             sel.segments[0].indices,
-            vec![Index::Slice { start: Some(1), end: Some(3) }]
+            vec![Index::Slice {
+                start: Some(1),
+                end: Some(3)
+            }]
         );
     }
 

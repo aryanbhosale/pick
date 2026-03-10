@@ -61,7 +61,12 @@ pub fn run(cli: &Cli, input: &str) -> Result<String, PickError> {
         results
     };
 
-    Ok(output::format_output(&results, cli.json, cli.lines, &cli.output))
+    Ok(output::format_output(
+        &results,
+        cli.json,
+        cli.lines,
+        &cli.output,
+    ))
 }
 
 fn parse_and_execute(
@@ -199,8 +204,7 @@ mod tests {
     fn run_headers() {
         let mut cli = make_cli(Some("content-type"));
         cli.input = InputFormat::Headers;
-        let result =
-            run(&cli, "Content-Type: application/json\nX-Request-Id: abc").unwrap();
+        let result = run(&cli, "Content-Type: application/json\nX-Request-Id: abc").unwrap();
         assert_eq!(result, "application/json");
     }
 
@@ -399,8 +403,7 @@ mod tests {
     #[test]
     fn run_pipeline_regex() {
         let cli = make_cli(Some("items[*] | select(.name ~ \"^a\") | name"));
-        let input =
-            r#"{"items": [{"name": "apple"}, {"name": "banana"}, {"name": "avocado"}]}"#;
+        let input = r#"{"items": [{"name": "apple"}, {"name": "banana"}, {"name": "avocado"}]}"#;
         let result = run(&cli, input).unwrap();
         assert_eq!(result, "apple\navocado");
     }
@@ -628,7 +631,9 @@ mod tests {
 
     #[test]
     fn run_select_or() {
-        let cli = make_cli(Some("[*] | select(.price > 100 or .featured == true) | name"));
+        let cli = make_cli(Some(
+            "[*] | select(.price > 100 or .featured == true) | name",
+        ));
         let input = r#"[{"name": "a", "price": 5, "featured": true}, {"name": "b", "price": 50, "featured": false}, {"name": "c", "price": 500, "featured": false}]"#;
         let result = run(&cli, input).unwrap();
         assert_eq!(result, "a\nc");

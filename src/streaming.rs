@@ -23,9 +23,8 @@ pub fn stream_process(
             continue;
         }
 
-        let value: serde_json::Value = serde_json::from_str(trimmed).map_err(|e| {
-            PickError::ParseError("json".into(), e.to_string())
-        })?;
+        let value: serde_json::Value = serde_json::from_str(trimmed)
+            .map_err(|e| PickError::ParseError("json".into(), e.to_string()))?;
 
         let results = execute(&value, expression)?;
         if results.is_empty() {
@@ -100,9 +99,7 @@ mod tests {
 
     #[test]
     fn stream_with_select() {
-        let input = Cursor::new(
-            "{\"price\": 50}\n{\"price\": 150}\n{\"price\": 200}\n",
-        );
+        let input = Cursor::new("{\"price\": 50}\n{\"price\": 150}\n{\"price\": 200}\n");
         let expr = Expression::parse("price").unwrap();
         let result = stream_process(input, &expr, false, false, &OutputFormat::Auto);
         assert!(result.is_ok());

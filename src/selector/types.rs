@@ -6,7 +6,10 @@ pub enum Index {
     /// Wildcard: `[*]`
     Wildcard,
     /// Slice: `[2:5]`, `[2:]`, `[:5]`, `[:]`
-    Slice { start: Option<i64>, end: Option<i64> },
+    Slice {
+        start: Option<i64>,
+        end: Option<i64>,
+    },
 }
 
 /// Built-in functions that transform values.

@@ -1,8 +1,8 @@
-mod types;
-mod parser;
 mod extract;
 pub mod filter;
 pub mod manipulate;
+mod parser;
+mod types;
 
+pub use extract::{apply_builtin, execute, execute_pipeline, extract, value_type_name};
 pub use types::*;
-pub use extract::{execute, execute_pipeline, extract, apply_builtin, value_type_name};
